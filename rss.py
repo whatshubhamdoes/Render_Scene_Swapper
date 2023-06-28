@@ -235,18 +235,70 @@ def convert_arnold_to_renderman_lights():
             if (light_type =='pointLight') :
                 intensity = cmds.getAttr(f"{light}.intensity")
                 l_color = cmds.getAttr(f"{light}.color")
+                exposure = cmds.getAttr(f"{light}.aiExposure")
+                print(exposure)
                 print(intensity)
                 print(l_color)
                 renderman_light = cmds.createNode("PxrSphereLight", name=f"{light}_RM")
                 cmds.setAttr(f"{renderman_light}.intensity", intensity)
                 cmds.setAttr(f"{renderman_light}.lightColor", l_color[0][0], l_color[0][1], l_color[0][2], type="double3")
+                cmds.setAttr(f"{renderman_light}.exposure", exposure)
                 cmds.matchTransform(f"{light}_RM",f"{light}")
                 shading_group = cmds.listConnections(light, type="shadingEngine")
                 print(shading_group)
                 if shading_group:
                     cmds.connectAttr(f"{renderman_light}.outLight", f"{shading_group[0]}.surfaceShader", force=True)
 
+            if (light_type =='directionalLight') :
+                intensity = cmds.getAttr(f"{light}.intensity")
+                l_color = cmds.getAttr(f"{light}.color")
+                exposure = cmds.getAttr(f"{light}.aiExposure")
+                print(exposure)
+                print(intensity)
+                print(l_color)
+                renderman_light = cmds.createNode("PxrDistantLight", name=f"{light}_RM")
+                cmds.setAttr(f"{renderman_light}.intensity", intensity)
+                cmds.setAttr(f"{renderman_light}.lightColor", l_color[0][0], l_color[0][1], l_color[0][2], type="double3")
+                cmds.setAttr(f"{renderman_light}.exposure", exposure)
+                cmds.matchTransform(f"{light}_RM",f"{light}")
+                shading_group = cmds.listConnections(light, type="shadingEngine")
+                print(shading_group)
+                if shading_group:
+                    cmds.connectAttr(f"{renderman_light}.outLight", f"{shading_group[0]}.surfaceShader", force=True)
         
+            if (light_type =='spotLight') :
+                intensity = cmds.getAttr(f"{light}.intensity")
+                l_color = cmds.getAttr(f"{light}.color")
+                exposure = cmds.getAttr(f"{light}.aiExposure")
+                print(exposure)
+                print(intensity)
+                print(l_color)
+                renderman_light = cmds.createNode("PxrDiskLight", name=f"{light}_RM")
+                cmds.setAttr(f"{renderman_light}.intensity", intensity)
+                cmds.setAttr(f"{renderman_light}.lightColor", l_color[0][0], l_color[0][1], l_color[0][2], type="double3")
+                cmds.setAttr(f"{renderman_light}.exposure", exposure)
+                cmds.matchTransform(f"{light}_RM",f"{light}")
+                shading_group = cmds.listConnections(light, type="shadingEngine")
+                print(shading_group)
+                if shading_group:
+                    cmds.connectAttr(f"{renderman_light}.outLight", f"{shading_group[0]}.surfaceShader", force=True)
+
+            if (light_type =='aiSkyDomeLight') :
+                intensity = cmds.getAttr(f"{light}.intensity")
+                l_color = cmds.getAttr(f"{light}.color")
+                exposure = cmds.getAttr(f"{light}.aiExposure")
+                print(exposure)
+                print(intensity)
+                print(l_color)
+                renderman_light = cmds.createNode("PxrDomeLight", name=f"{light}_RM")
+                cmds.setAttr(f"{renderman_light}.intensity", intensity)
+                cmds.setAttr(f"{renderman_light}.lightColor", l_color[0][0], l_color[0][1], l_color[0][2], type="double3")
+                cmds.setAttr(f"{renderman_light}.exposure", exposure)
+                cmds.matchTransform(f"{light}_RM",f"{light}")
+                shading_group = cmds.listConnections(light, type="shadingEngine")
+                print(shading_group)
+                if shading_group:
+                    cmds.connectAttr(f"{renderman_light}.outLight", f"{shading_group[0]}.surfaceShader", force=True)
 
 # Function to create the UI and run the functions according to the selection on radio buttons
 def createUI():
