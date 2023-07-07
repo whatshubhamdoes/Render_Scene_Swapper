@@ -1,0 +1,44 @@
+{
+"light_attributes" : {
+    "aiAreaLight": {
+        "renderman_light_type": "PxrRectLight",
+        "attributes": {
+            "intensity": "aiIntensity",
+            "color": "aiColor",
+            "exposure": "aiExposure"
+        }
+    },
+    "pointLight": {
+        "renderman_light_type": "PxrSphereLight",
+        "attributes": {
+            "intensity": "intensity",
+            "color": "color",
+            "exposure": "aiExposure"
+        }
+    },
+    "directionalLight": {
+        "renderman_light_type": "PxrDistantLight",
+        "attributes": {
+            "intensity": "intensity",
+            "color": "color",
+            "exposure": "aiExposure"
+        }
+    },
+    "spotLight": {
+        "renderman_light_type": "PxrDiskLight",
+        "attributes": {
+            "intensity": "intensity",
+            "color": "color",
+            "exposure": "aiExposure"
+        }
+    },
+    "aiSkyDomeLight": {
+        "renderman_light_type": "PxrDomeLight",
+        "attributes": {
+            "intensity": "intensity",
+            "color": "color",
+            "exposure": "aiExposure"
+        }
+    }
+}
+}
