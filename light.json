@@ -1,7 +1,0 @@
-{
-    "Light" : {
-        "DistantLight" : ["Directional","PxrDistant",],
-        "Attribute_intensity" : ["intensity","intensity"],
-
-    }
-}
