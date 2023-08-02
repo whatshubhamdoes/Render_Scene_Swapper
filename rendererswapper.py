@@ -47,6 +47,22 @@ def lightsConversion():
             print(light)  
             light_type = cmds.nodeType(light)
             print(light_type)
+            if (light_type == lightsData["Lights"]["area_light"]["name"][number]):
+                a_intensity = lightsData["Lights"]["area_light"]["attribute_intensity"][number]
+                a_color = lightsData["Lights"]["area_light"]["attribute_color"][number]
+                a_exposure = lightsData["Lights"]["area_light"]["attribute_exposure"][number]
+                intensity=cmds.getAttr(f"{light}.{a_intensity}")
+                l_color = cmds.getAttr(f"{light}.{a_color}")
+                exposure = cmds.getAttr(f"{light}.{a_exposure}")
+                convLight=lightsData["Lights"]["area_light"]["name"][1] #change 1 to a variable as per UI
+                convLight=cmds.createNode("{convLight}",name=f"{light}_conv")
+                a_intensity = lightsData["Lights"]["area_light"]["attribute_intensity"][1]
+                a_color = lightsData["Lights"]["area_light"]["attribute_color"][1]
+                a_exposure = lightsData["Lights"]["area_light"]["attribute_exposure"][1]
+                cmds.setAttr(f"{convLight}.{a_intensity}", intensity)
+                cmds.setAttr(f"{convLight}.{a_color}", l_color[0][0], l_color[0][1], l_color[0][2], type="double3")
+                cmds.setAttr(f"{convLight}.{a_exposure}", exposure)
+                cmds.matchTransform(f"{light}_conv",f"{light}")
 
 
 
