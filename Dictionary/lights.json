@@ -1,43 +1,44 @@
 {   
     "Lights" : 
     {
+        "renderer" : ["arnold","renderman","vray","cycles"],
         "area_light" : {
-            "renderer" : ["Arnold","Renderman","VRay","Cycles"],
+            "renderer" : ["arnold","renderman","vray","cycles"],
             "name" : ["aiAreaLight","PxrRectLight","VRayLightRectShape","AreaLight"],
             "attribute_intensity" : ["intensity","intensity","intensity","energy"],
             "attribute_color" : ["color","lightColor","color","color"],
             "attribute_exposure" : ["exposure","exposure","",""]
         },
         "point_light" : {
-            "renderer" : ["Arnold","Renderman","VRay","Cycles"],
+            "renderer" : ["arnold","renderman","vray","cycles"],
             "name" : ["pointLight","PxrSphereLight","VRayLightSphereShape","PointLight"],
             "attribute_intensity" : ["intensity","intensity","intensity","energy"],
             "attribute_color" : ["color","lightColor","color","color"],
             "attribute_exposure" : ["exposure","exposure","",""]
         },
         "directional_light" : {
-            "renderer" : ["Arnold","Renderman","VRay","Cycles"],
+            "renderer" : ["arnold","renderman","vray","cycles"],
             "name" : ["directionalLight","PxrDistantLight","","SunLight"],
             "attribute_intensity" : ["intensity","intensity","intensity","energy"],
             "attribute_color" : ["color","lightColor","color","color"],
             "attribute_exposure" : ["exposure","exposure","",""]
         },
         "spot_light" : {
-            "renderer" : ["Arnold","Renderman","VRay","Cycles"],
+            "renderer" : ["arnold","renderman","vray","cycles"],
             "name" : ["spotLight","PxrDiskLight","","SpotLight"],
             "attribute_intensity" : ["intensity","intensity","intensity","energy"],
             "attribute_color" : ["color","lightColor","color","color"],
             "attribute_exposure" : ["exposure","exposure","",""]
         },
         "skyDome_light" : {
-            "renderer" : ["Arnold","Renderman","VRay","Cycles"],
+            "renderer" : ["arnold","renderman","vray","cycles"],
             "name" : ["aiSkyDomeLight","PxrDomeLight","VRayLightDomeShape","ShaderNodeTexEnvironment"],
             "attribute_intensity" : ["intensity","intensity","intensity","strength"],
             "attribute_color" : ["color","lightColor","color","color"],
             "attribute_exposure" : ["exposure","exposure","",""]
         },
         "mesh_light" : {
-            "renderer" : ["Arnold","Renderman","VRay","Cycles"],
+            "renderer" : ["arnold","renderman","vray","cycles"],
             "name" : ["aiMeshLight","PxrMeshLight","VRayLightMesh","ShaderNodeEmission"],
             "attribute_intensity" : ["intensity","intensity","intensity","strength"],
             "attribute_color" : ["color","lightColor","color","color"],
