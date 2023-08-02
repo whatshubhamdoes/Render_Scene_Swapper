@@ -28,13 +28,12 @@ def assignNumber(currentRenderer):
     else:
         return False 
 
+
 def lightsConversion():
     with open('Dictionary/lights.json','r') as file :
         lightsData=json.load(file)
-
     currentRenderer=getCurrentRenderer()    
     number=assignNumber(currentRenderer)
-
     sel = cmds.ls(sl=True)
     if not sel :
         cmds.confirmDialog(title='Error', message='Please select an object', button=['OK'], defaultButton='OK')
@@ -55,16 +54,19 @@ def lightsConversion():
                 l_color = cmds.getAttr(f"{light}.{a_color}")
                 exposure = cmds.getAttr(f"{light}.{a_exposure}")
                 convLight=lightsData["Lights"]["area_light"]["name"][1] #change 1 to a variable as per UI
-                convLight=cmds.createNode("{convLight}",name=f"{light}_conv")
+                print(convLight)
+                convLight=cmds.shadingNode(f"{convLight}",asLight=True,name=f"{light}_conv")
                 a_intensity = lightsData["Lights"]["area_light"]["attribute_intensity"][1]
                 a_color = lightsData["Lights"]["area_light"]["attribute_color"][1]
                 a_exposure = lightsData["Lights"]["area_light"]["attribute_exposure"][1]
                 cmds.setAttr(f"{convLight}.{a_intensity}", intensity)
                 cmds.setAttr(f"{convLight}.{a_color}", l_color[0][0], l_color[0][1], l_color[0][2], type="double3")
                 cmds.setAttr(f"{convLight}.{a_exposure}", exposure)
-                cmds.matchTransform(f"{light}_conv",f"{light}")
-
-
+                lightTransform=cmds.listRelatives(light,parent=True,shapes=True,fullPath=True)
+                cmds.matchTransform(f"{convLight}", lightTransform)
+                lightSet=cmds.listRelatives(lightTransform,parent=True,fullPath=True)
+                if lightSet:
+                    cmds.parent(f"{convLight}", lightSet)
 
 def convertLights():
     currentRenderer=getCurrentRenderer()
