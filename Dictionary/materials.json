@@ -1,7 +1,8 @@
 {
     "Materials": {
+        "renderer" : ["arnold","renderman","vray","cycles"],
         "standard_material": {
-            "renderer": ["Arnold", "Renderman", "VRay", "Cycles"],
+            "renderer": ["arnold","renderman","vray","cycles"],
             "name": ["aiStandardSurface", "PxrSurface", "VRayMtl", "Principled BSDF"],
             "attribute_diffuse_color": ["baseColor", "diffuseColor", "diffuseColor", "Base Color"],
             "attribute_specular_color": ["specularColor", "specularFaceColor", "reflectionColor", "Specular"],
@@ -15,7 +16,7 @@
             "attribute_ambient_occlusion": ["occlusion", "ambientOcclusion", "ao", "Ambient Occlusion"]
         },
         "hair_material": {
-            "renderer": ["Arnold", "Renderman", "VRay", "Cycles"],
+            "renderer": ["arnold","renderman","vray","cycles"],
             "name": ["aiStandardHair", "PxrMarschnerHair", "VRayHairMtl", "Hair BSDF"],
             "attribute_diffuse_color": ["baseColor", "diffuseColor", "diffuseColor", "Base Color"],
             "attribute_specular_color": ["specularColor", "specularFaceColor", "reflectionColor", "Specular"],

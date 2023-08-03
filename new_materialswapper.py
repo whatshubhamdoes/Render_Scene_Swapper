@@ -11,9 +11,9 @@ def getCurrentRenderer():
     return currentRenderer
 
 def checkCurrentRenderer(currentRenderer):
-    with open('/transfer/s5512613_SP/Masters_Project/Render_Scene_Swapper/Dictionary/lights.json','r') as file :
+    with open('/transfer/s5512613_SP/Masters_Project/Render_Scene_Swapper/Dictionary/materials.json','r') as file :
         lightsData=json.load(file)
-    for rendererInfo in lightsData["Lights"]["renderer"]:
+    for rendererInfo in lightsData["Materials"]["renderer"]:
         if currentRenderer in rendererInfo:
             return ("Renderer Supported")
 
@@ -68,7 +68,7 @@ def copyLightAttributes(light,lightsData,light_type,number,convNumber):
         cmds.parent(f"{convLight}", lightSet)    
 
 def lightsConversion(convNumber):
-    with open('/transfer/s5512613_SP/Masters_Project/Render_Scene_Swapper/Dictionary/lights.json','r') as file :
+    with open('/transfer/s5512613_SP/Masters_Project/Render_Scene_Swapper/Dictionary/materials.json','r') as file :
         lightsData=json.load(file)
     currentRenderer=getCurrentRenderer()    
     number=assignNumber(currentRenderer)
@@ -77,27 +77,39 @@ def lightsConversion(convNumber):
         cmds.confirmDialog(title='Error', message='Please select an object', button=['OK'], defaultButton='OK')
         cmds.warning("Error : Please select an object")
         return
-
-    light_conversion_map = {
-        lightsData["Lights"]["area_light"]["name"][number]: "area_light",
-        lightsData["Lights"]["point_light"]["name"][number]: "point_light",
-        lightsData["Lights"]["directional_light"]["name"][number]: "directional_light",
-        lightsData["Lights"]["spot_light"]["name"][number]: "spot_light",
-        lightsData["Lights"]["skyDome_light"]["name"][number]: "skyDome_light",
-        lightsData["Lights"]["mesh_light"]["name"][number]: "mesh_light"
-    }
-
-    for obj in sel:
-        lights = cmds.ls(sl=True, dag=True, s=True)
+    for obj in sel:    
+        lights = cmds.ls(sl = True, dag = True, s = True)
         print(lights)
         for light in lights:
-            print(light)
+            print(light)  
             light_type = cmds.nodeType(light)
             print(light_type)
-            if light_type in light_conversion_map:
-                light_type = light_conversion_map[light_type]
+            if (light_type == lightsData["Lights"]["area_light"]["name"][number]):
+                light_type="area_light"
                 print(light_type)
-                copyLightAttributes(light, lightsData, light_type, number, convNumber)
+                copyLightAttributes(light,lightsData,light_type,number,convNumber)
+            elif(light_type == lightsData["Lights"]["point_light"]["name"][number]):
+                light_type="point_light"
+                print(light_type)
+                copyLightAttributes(light,lightsData,light_type,number,convNumber)
+            elif(light_type == lightsData["Lights"]["directional_light"]["name"][number]):
+                light_type="directional_light"
+                print(light_type)
+                copyLightAttributes(light,lightsData,light_type,number,convNumber)
+            elif(light_type == lightsData["Lights"]["spot_light"]["name"][number]):
+                light_type="spot_light"
+                print(light_type)
+                copyLightAttributes(light,lightsData,light_type,number,convNumber)
+            elif(light_type == lightsData["Lights"]["skyDome_light"]["name"][number]):
+                light_type="skyDome_light"
+                print(light_type)
+                copyLightAttributes(light,lightsData,light_type,number,convNumber)
+            elif(light_type == lightsData["Lights"]["mesh_light"]["name"][number]):
+                light_type="mesh_light"
+                print(light_type)
+                copyLightAttributes(light,lightsData,light_type,number,convNumber) 
+            else:
+                pass
 
 
 def convertLights(convNumber):
