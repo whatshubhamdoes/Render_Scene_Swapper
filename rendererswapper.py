@@ -14,7 +14,6 @@ def checkCurrentRenderer(currentRenderer):
     with open('Dictionary/lights.json','r') as file :
         lightsData=json.load(file)
     for rendererInfo in lightsData["Lights"]["renderer"]:
-        #print(rendererInfo)
         if currentRenderer in rendererInfo:
             return ("Renderer Supported")
 
