@@ -55,7 +55,7 @@ def materialsConversion(convNumber):
             for sg in shadeEng :
                 material=cmds.ls(cmds.listConnections(shadeEng),materials = True)
                 print(material)
-                if cmds.nodeType(material) != 'aiStandardSurface' : #change to read from all of json
+                if cmds.nodeType(material) != materialsData[material] : #change to read from all of json
                     cmds.confirmDialog(title='Error', message='Selected object does not have an Arnold Standard Surface material applied.', button=['OK'], defaultButton='OK')
                     cmds.warning("Error : Selected object does not have an Arnold Standard Surface material applied.")
                     return
@@ -63,7 +63,7 @@ def materialsConversion(convNumber):
                     new_material=cmds.shadingNode('PxrSurface',asShader=True) #change to get from json
                     new_sg=cmds.sets(new_material,renderable=True, noSurfaceShader=True, empty=True, name=new_material + '_conv')
                     cmds.connectAttr(new_material + '.outColor',new_sg + '.surfaceShader',force=True)
-
+                    
 
 def convertMaterials(convNumber):
     currentRenderer=getCurrentRenderer()
