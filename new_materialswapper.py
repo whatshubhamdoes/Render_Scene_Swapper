@@ -59,12 +59,22 @@ def copyMaterialAttributes(material, materialsData, material_type, number, convN
             
             convMaterial=''.join(convMaterial)
             convMaterial_new=convMaterial+'.'+convAttr
-            cmds.setAttr(convMaterial_new,value[0][0],value[0][1],value[0][2],type='double3')
-            if file_node:
-                file_path=cmds.listConnections(attribute,type='file')
-                file_path=''.join(file_path)
-                cmds.connectAttr(file_path+'.outColor',convMaterial_new)
-
+            if(attr=='met*'):
+                print("Metallic work in progress")
+            else:
+                try:
+                    cmds.setAttr(convMaterial_new,value)
+                except:
+                    cmds.setAttr(convMaterial_new,value[0][0],value[0][1],value[0][2],type='double3')
+                    if file_node:
+                        file_path=cmds.listConnections(attribute)
+                        file_path=''.join(file_path)
+                        try:
+                            cmds.connectAttr(file_path+'.outColor',convMaterial_new)
+                        except:
+                            cmds.connectAttr(file_path+'.outAlpha',convMaterial_new)
+                        finally:
+                         cmds.connectAttr(file_path+'.outValue',convMaterial_new)
         except:
             continue
     return convMaterialShadingGroup
