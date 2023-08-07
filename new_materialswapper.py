@@ -41,12 +41,33 @@ def copyMaterialAttributes(material, materialsData, material_type, number, convN
     convMaterial=cmds.shadingNode(f"{convMaterial}",asShader=True,name=f"{material}_conv")
     convMaterialShadingGroup = cmds.sets(convMaterial,renderable=True,noSurfaceShader=True,empty=True, name=convMaterial + 'SG')
     cmds.connectAttr(convMaterial + '.outColor', convMaterialShadingGroup+'.surfaceShader',force=True)
+    
     components_material_map={}
     createMaterialComponentMap(components_material_map,materialsData,material_type,number)
     print(components_material_map)
+    
     components_convMaterial_map={}
     createMaterialComponentMap(components_convMaterial_map,materialsData,material_type,convNumber)
-    print(components_convMaterial_map) 
+    print(components_convMaterial_map)
+    
+    for attr, convAttr in zip(components_material_map.values(), components_convMaterial_map.values()):
+        try:
+            material_new=''.join(material)
+            attribute=material_new+'.'+attr
+            value=cmds.getAttr(attribute)
+            file_node=cmds.connectionInfo(attribute,sourceFromDestination=True)
+            
+            convMaterial=''.join(convMaterial)
+            convMaterial_new=convMaterial+'.'+convAttr
+            cmds.setAttr(convMaterial_new,value[0][0],value[0][1],value[0][2],type='double3')
+            if file_node:
+                file_path=cmds.listConnections(attribute,type='file')
+                file_path=''.join(file_path)
+                cmds.connectAttr(file_path+'.outColor',convMaterial_new)
+
+        except:
+            continue
+    return convMaterialShadingGroup
 
 def materialsConversion(convNumber):
     with open('/transfer/s5512613_SP/Masters_Project/Render_Scene_Swapper/Dictionary/materials.json','r') as file :
@@ -79,8 +100,10 @@ def materialsConversion(convNumber):
                 if material_type in material_conversion_map :
                     material_type=material_conversion_map[material_type]
                     print(material_type)
-                    copyMaterialAttributes(material, materialsData, material_type, number, convNumber)
-                    
+                    shading_group= copyMaterialAttributes(material, materialsData, material_type, number, convNumber)
+                cmds.sets(sel[0],edit=True,forceElement=shading_group)
+
+
 
 def convertMaterials(convNumber):
     currentRenderer=getCurrentRenderer()
