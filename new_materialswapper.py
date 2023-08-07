@@ -27,13 +27,26 @@ def assignNumber(currentRenderer):
     else:
         return False 
 
+def createMaterialComponentMap(components_material_map,materialsData,material_type,number):
+    for material in materialsData["Materials"]:
+        if material != "renderer":
+            for key,value in materialsData["Materials"][material_type].items():
+                if key in ["attribute_diffuse_color", "attribute_specular_color", "attribute_roughness", "attribute_metalness", "attribute_opacity", "attribute_normal_map", "attribute_displacement", "attribute_emissive_color", "attribute_transparency", "attribute_ambient_occlusion"]:
+                    components_material_map[key]= value[number]
+
+
 def copyMaterialAttributes(material, materialsData, material_type, number, convNumber):
     convMaterial=materialsData["Materials"][material_type]["name"][convNumber]
     print(convMaterial)
     convMaterial=cmds.shadingNode(f"{convMaterial}",asShader=True,name=f"{material}_conv")
     convMaterialShadingGroup = cmds.sets(convMaterial,renderable=True,noSurfaceShader=True,empty=True, name=convMaterial + 'SG')
     cmds.connectAttr(convMaterial + '.outColor', convMaterialShadingGroup+'.surfaceShader',force=True)
-    
+    components_material_map={}
+    createMaterialComponentMap(components_material_map,materialsData,material_type,number)
+    print(components_material_map)
+    components_convMaterial_map={}
+    createMaterialComponentMap(components_convMaterial_map,materialsData,material_type,convNumber)
+    print(components_convMaterial_map) 
 
 def materialsConversion(convNumber):
     with open('/transfer/s5512613_SP/Masters_Project/Render_Scene_Swapper/Dictionary/materials.json','r') as file :
