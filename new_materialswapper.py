@@ -27,6 +27,13 @@ def assignNumber(currentRenderer):
     else:
         return False 
 
+def copyMaterialAttributes(material, materialsData, material_type, number, convNumber):
+    convMaterial=materialsData["Materials"][material_type]["name"][convNumber]
+    print(convMaterial)
+    convMaterial=cmds.shadingNode(f"{convMaterial}",asShader=True,name=f"{material}_conv")
+    convMaterialShadingGroup = cmds.sets(convMaterial,renderable=True,noSurfaceShader=True,empty=True, name=convMaterial + 'SG')
+    cmds.connectAttr(convMaterial + '.outColor', convMaterialShadingGroup+'.surfaceShader',force=True)
+    
 
 def materialsConversion(convNumber):
     with open('/transfer/s5512613_SP/Masters_Project/Render_Scene_Swapper/Dictionary/materials.json','r') as file :
@@ -57,11 +64,9 @@ def materialsConversion(convNumber):
                 print(material)
                 material_type=cmds.nodeType(material)
                 if material_type in material_conversion_map :
-                    material_type=material_conversion_map[material_type] 
-                    new_material=cmds.shadingNode('PxrSurface',asShader=True) #change to get from json
-                    new_sg=cmds.sets(new_material,renderable=True, noSurfaceShader=True, empty=True, name=new_material + '_conv')
-                    cmds.connectAttr(new_material + '.outColor',new_sg + '.surfaceShader',force=True)
-                    print("Working")
+                    material_type=material_conversion_map[material_type]
+                    print(material_type)
+                    copyMaterialAttributes(material, materialsData, material_type, number, convNumber)
                     
 
 def convertMaterials(convNumber):
