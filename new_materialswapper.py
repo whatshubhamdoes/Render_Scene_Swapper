@@ -132,7 +132,7 @@ def materialsConversion(convNumber):
                             material_type=material_conversion_map[material_type]
                             print(material_type)
                             shading_group= copyMaterialAttributes(material, materialsData, material_type, number, convNumber)
-                        cmds.sets(sg,edit=True,forceElement=shading_group)
+                        cmds.sets(object,edit=True,forceElement=shading_group)
 
 
 
