@@ -60,12 +60,30 @@ def copyMaterialAttributes(material, materialsData, material_type, number, convN
             convMaterial=''.join(convMaterial)
             convMaterial_new=convMaterial+'.'+convAttr
             if(attr=='met*'):
-                print("Metallic work in progress")
+                if(convNumber or number == 1):
+                    print("Renderman Metallic")
+                else:
+                    try:
+                        cmds.setAttr(convMaterial_new,value)
+                    except:
+                        cmds.setAttr(convMaterial_new,value[0][0],value[0][1],value[0][2],type='double3')
+                    finally:
+                        if file_node:
+                            file_path=cmds.listConnections(attribute)
+                            file_path=''.join(file_path)
+                            try:
+                                cmds.connectAttr(file_path+'.outColor',convMaterial_new)
+                            except:
+                                cmds.connectAttr(file_path+'.outAlpha',convMaterial_new)
+                            finally:
+                                cmds.connectAttr(file_path+'.outValue',convMaterial_new)
+
             else:
                 try:
                     cmds.setAttr(convMaterial_new,value)
                 except:
                     cmds.setAttr(convMaterial_new,value[0][0],value[0][1],value[0][2],type='double3')
+                finally:
                     if file_node:
                         file_path=cmds.listConnections(attribute)
                         file_path=''.join(file_path)
@@ -74,7 +92,7 @@ def copyMaterialAttributes(material, materialsData, material_type, number, convN
                         except:
                             cmds.connectAttr(file_path+'.outAlpha',convMaterial_new)
                         finally:
-                         cmds.connectAttr(file_path+'.outValue',convMaterial_new)
+                            cmds.connectAttr(file_path+'.outValue',convMaterial_new)
         except:
             continue
     return convMaterialShadingGroup
@@ -102,16 +120,19 @@ def materialsConversion(convNumber):
             print (object)
             shadeEng=cmds.listConnections(object,type='shadingEngine')
             print(shadeEng)
-        if shadeEng :
-            for sg in shadeEng :
-                material=cmds.ls(cmds.listConnections(shadeEng),materials = True)
-                print(material)
-                material_type=cmds.nodeType(material)
-                if material_type in material_conversion_map :
-                    material_type=material_conversion_map[material_type]
-                    print(material_type)
-                    shading_group= copyMaterialAttributes(material, materialsData, material_type, number, convNumber)
-                cmds.sets(sel[0],edit=True,forceElement=shading_group)
+            if shadeEng :
+                for sg in shadeEng :
+                    print (sg)
+                    material=cmds.ls(cmds.listConnections(sg),materials = True)
+                    print(material)
+                    for mat in material:
+                        material_type=cmds.nodeType(mat)
+                        print(material_type)
+                        if material_type in material_conversion_map :
+                            material_type=material_conversion_map[material_type]
+                            print(material_type)
+                            shading_group= copyMaterialAttributes(material, materialsData, material_type, number, convNumber)
+                        cmds.sets(sg,edit=True,forceElement=shading_group)
 
 
 
