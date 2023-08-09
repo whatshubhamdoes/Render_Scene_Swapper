@@ -27,11 +27,6 @@ def assignNumber(currentRenderer):
     else:
         return False 
 
-def toRendermanMetallic():
-    print("toRenderman")
-
-def fromRendermanMetallic():
-    print("fromRenderman")
 
 def createMaterialComponentMap(components_material_map,materialsData,material_type,number):
     for material in materialsData["Materials"]:
@@ -68,9 +63,10 @@ def copyMaterialAttributes(material, materialsData, material_type, number, convN
             if(attr=='met*'):
                 if(convNumber or number == 1):
                     if(convNumber==1):
-                        toRendermanMetallic()
+                        # as explained in this - https://rmanwiki.pixar.com/display/REN24/PxrMetallicWorkflow
+                      
                     else:
-                        fromRendermanMetallic()
+                        
                 else:
                     try:
                         cmds.setAttr(convMaterial_new,value)
