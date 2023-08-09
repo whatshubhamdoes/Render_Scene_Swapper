@@ -37,70 +37,153 @@ def createMaterialComponentMap(components_material_map,materialsData,material_ty
 
 
 def copyMaterialAttributes(material, materialsData, material_type, number, convNumber):
-    convMaterial=materialsData["Materials"][material_type]["name"][convNumber]
+    convMaterial = materialsData["Materials"][material_type]["name"][convNumber]
     print(convMaterial)
-    convMaterial=cmds.shadingNode(f"{convMaterial}",asShader=True,name=f"{material}_conv")
-    convMaterialShadingGroup = cmds.sets(convMaterial,renderable=True,noSurfaceShader=True,empty=True, name=convMaterial + 'SG')
-    cmds.connectAttr(convMaterial + '.outColor', convMaterialShadingGroup+'.surfaceShader',force=True)
+    convMaterial = cmds.shadingNode(f"{convMaterial}", asShader=True, name=f"{material}_conv")
+    convMaterialShadingGroup = cmds.sets(convMaterial, renderable=True, noSurfaceShader=True, empty=True, name=convMaterial + 'SG')
+    cmds.connectAttr(convMaterial + '.outColor', convMaterialShadingGroup + '.surfaceShader', force=True)
     
-    components_material_map={}
-    createMaterialComponentMap(components_material_map,materialsData,material_type,number)
+    components_material_map = {}
+    createMaterialComponentMap(components_material_map, materialsData, material_type, number)
     print(components_material_map)
     
-    components_convMaterial_map={}
-    createMaterialComponentMap(components_convMaterial_map,materialsData,material_type,convNumber)
+    components_convMaterial_map = {}
+    createMaterialComponentMap(components_convMaterial_map, materialsData, material_type, convNumber)
     print(components_convMaterial_map)
     
     for attr, convAttr in zip(components_material_map.values(), components_convMaterial_map.values()):
         try:
-            material_new=''.join(material)
-            attribute=material_new+'.'+attr
-            value=cmds.getAttr(attribute)
-            file_node=cmds.connectionInfo(attribute,sourceFromDestination=True)
+            material_new = ''.join(material)
+            attribute = material_new + '.' + attr
+            value = cmds.getAttr(attribute)
+            file_node = cmds.connectionInfo(attribute, sourceFromDestination=True)
             
-            convMaterial=''.join(convMaterial)
-            convMaterial_new=convMaterial+'.'+convAttr
-            if(attr=='met*'):
-                if(convNumber or number == 1):
-                    if(convNumber==1):
+            convMaterial = ''.join(convMaterial)
+            convMaterial_new = convMaterial + '.' + convAttr
+            if 'met'in attr.lower():
+                if convNumber or number == 1:
+                    if convNumber == 1:
                         # as explained in this - https://rmanwiki.pixar.com/display/REN24/PxrMetallicWorkflow
-                      
-                    else:
+                        renderman_shader = ''.join(convMaterial)
+                        print(renderman_shader)
+                        print(convMaterial)
+                        rman_metallic_shader = cmds.shadingNode('PxrMetallicWorkflow', asShader=True)
+                        if file_node:
+                            try:
+                                file_path_bColor = cmds.listConnections(convMaterial + '.baseColor', type='file')
+                                file_path_bColor = ''.join(file_path_bColor)
+                            except:
+                                file_path_bColor = cmds.listConnections(convMaterial + '.diffuseColor', type='file')
+                                file_path_bColor = ''.join(file_path_bColor)
+
+                            cmds.connectAttr(file_path_bColor + '.outColor', rman_metallic_shader + '.baseColor')
+                            file_path_metallic = cmds.listConnections(material_new + attr, type='file')
+                            file_path_metallic = ''.join(file_path_metallic)
+                            cmds.connectAttr(file_path_metallic + '.outAlpha', rman_metallic_shader + '.metallic')
+                            
+                        else:
+                            try:
+                                file_node_new = cmds.connectionInfo(material_new + '.baseColor', sourceFromDestination=True)
+                            except:
+                                file_node_new = cmds.connectionInfo(material_new + '.diffuseColor', sourceFromDestination=True)
+                            if file_node_new:
+                                try:
+                                    file_path_bColor = cmds.listConnections(material_new + '.baseColor', type='file')
+                                    file_path_bColor = ''.join(file_path_bColor)
+                                except:
+                                    file_path_bColor = cmds.listConnections(material_new + '.diffuseColor', type='file')
+                                    file_path_bColor = ''.join(file_path_bColor)
+                                
+                                cmds.connectAttr(file_path_bColor + '.outColor', rman_metallic_shader + '.baseColor')
+                                metalness = cmds.getAttr(material_new + attr)
+                                print(metalness)
+                                cmds.setAttr(rman_metallic_shader + '.metallic', metalness)
+                            
+                            else:
+                                try:       
+                                    diffuse_color = cmds.getAttr(material_new + '.baseColor')
+                                except:
+                                    diffuse_color = cmds.getAttr(material_new + '.diffuseColor')
+                                
+                                cmds.setAttr(rman_metallic_shader + '.baseColor', diffuse_color[0][0], diffuse_color[0][1], diffuse_color[0][2], type='double3')
+                                metalness = cmds.getAttr(material_new + attr)
+                                print(metalness)
+                                cmds.setAttr(rman_metallic_shader + '.metallic', metalness)
                         
+                        cmds.connectAttr(rman_metallic_shader + '.resultDiffuseRGB', convMaterial + '.diffuseColor', force=True)
+                        cmds.connectAttr(rman_metallic_shader + '.resultSpecularEdgeRGB', convMaterial + '.specularEdgeColor', force=True)
+                        cmds.connectAttr(rman_metallic_shader + '.resultSpecularFaceRGB', convMaterial + '.specularFaceColor', force=True)
+
+                    else:
+                        print("from renderman metallic")
+                        conv_shader=''.join(convMaterial)
+                        conv_shader_new=conv_shader+'.'+attr
+                        print(conv_shader_new)
+                        file_paths=cmds.listConnections(material_new + '.diffuseColor')
+                        try:
+                            file_paths=''.join(file_paths)
+                            file_paths=cmds.getAttr(file_paths+attr)
+                            cmds.setAttr(conv_shader_new,file_paths)
+                        except:
+                            value=cmds.getAttr(attribute)
+                            file_node=cmds.connectionInfo(attribute,sourceFromDestination=True)
+                            file_paths=''.join(file_paths)
+                            if 'met' in file_paths.lower():
+                                try:
+                                    try:
+                                        file_paths = cmds.listConnections(file_paths+'.baseColor')
+                                    except:
+                                        file_paths = cmds.listConnections(file_paths+'.diffuseColor')
+                                    file_paths=''.join(file_paths)
+                                    cmds.connectAttr(file_paths + '.outColor', conv_shader_new)
+                                except:
+                                    print("except")
+                                    print(file_paths)
+                                    try:
+                                        file_paths=cmds.getAttr(file_paths +'.baseColor')
+                                    except:
+                                        file_paths=cmds.getAttr(file_paths +'.diffuseColor')
+                                    cmds.setAttr(conv_shader_new,file_paths)
+                            else:
+                                cmds.connectAttr(file_paths + '.outColor', conv_shader_new)
+
+                        
+                
                 else:
                     try:
-                        cmds.setAttr(convMaterial_new,value)
+                        cmds.setAttr(convMaterial_new, value)
                     except:
-                        cmds.setAttr(convMaterial_new,value[0][0],value[0][1],value[0][2],type='double3')
+                        cmds.setAttr(convMaterial_new, value[0][0], value[0][1], value[0][2], type='double3')
                     finally:
                         if file_node:
-                            file_path=cmds.listConnections(attribute)
-                            file_path=''.join(file_path)
+                            file_path = cmds.listConnections(attribute)
+                            file_path = ''.join(file_path)
                             try:
-                                cmds.connectAttr(file_path+'.outColor',convMaterial_new)
+                                cmds.connectAttr(file_path + '.outColor', convMaterial_new)
                             except:
-                                cmds.connectAttr(file_path+'.outAlpha',convMaterial_new)
+                                cmds.connectAttr(file_path + '.outAlpha', convMaterial_new)
                             finally:
-                                cmds.connectAttr(file_path+'.outValue',convMaterial_new)
+                                cmds.connectAttr(file_path + '.outValue', convMaterial_new)
 
             else:
                 try:
-                    cmds.setAttr(convMaterial_new,value)
+                    cmds.setAttr(convMaterial_new, value)
                 except:
-                    cmds.setAttr(convMaterial_new,value[0][0],value[0][1],value[0][2],type='double3')
+                    cmds.setAttr(convMaterial_new, value[0][0], value[0][1], value[0][2], type='double3')
                 finally:
                     if file_node:
-                        file_path=cmds.listConnections(attribute)
-                        file_path=''.join(file_path)
+                        file_path = cmds.listConnections(attribute)
+                        file_path = ''.join(file_path)
                         try:
-                            cmds.connectAttr(file_path+'.outColor',convMaterial_new)
+                            cmds.connectAttr(file_path + '.outColor', convMaterial_new)
                         except:
-                            cmds.connectAttr(file_path+'.outAlpha',convMaterial_new)
+                            cmds.connectAttr(file_path + '.outAlpha', convMaterial_new)
                         finally:
-                            cmds.connectAttr(file_path+'.outValue',convMaterial_new)
+                            cmds.connectAttr(file_path + '.outValue', convMaterial_new)
         except:
             continue
     return convMaterialShadingGroup
+
 
 def materialsConversion(convNumber):
     with open('/transfer/s5512613_SP/Masters_Project/Render_Scene_Swapper/Dictionary/materials.json','r') as file :
