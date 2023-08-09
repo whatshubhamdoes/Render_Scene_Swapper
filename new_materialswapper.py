@@ -27,6 +27,12 @@ def assignNumber(currentRenderer):
     else:
         return False 
 
+def toRendermanMetallic():
+    print("toRenderman")
+
+def fromRendermanMetallic():
+    print("fromRenderman")
+
 def createMaterialComponentMap(components_material_map,materialsData,material_type,number):
     for material in materialsData["Materials"]:
         if material != "renderer":
@@ -61,7 +67,10 @@ def copyMaterialAttributes(material, materialsData, material_type, number, convN
             convMaterial_new=convMaterial+'.'+convAttr
             if(attr=='met*'):
                 if(convNumber or number == 1):
-                    print("Renderman Metallic")
+                    if(convNumber==1):
+                        toRendermanMetallic()
+                    else:
+                        fromRendermanMetallic()
                 else:
                     try:
                         cmds.setAttr(convMaterial_new,value)
