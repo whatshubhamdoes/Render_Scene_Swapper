@@ -181,8 +181,9 @@ def createUI():
     cmds.window(window_name, title="Universal Renderer Scene Swapper : Maya", widthHeight=(500, 300))
 
     # Creating two optionMenus to choose the conversion from and to renderers
-    layout = cmds.columnLayout(adjustableColumn=True)
-    cmds.text(label="Please select all the lights and then select the conversion function:")
+    layout = cmds.columnLayout(adjustableColumn=True, width=500, columnAlign="center")  # Set width and alignment
+    
+    cmds.text(label="Please select all the lights and then select the conversion function:", align="center")  # Center align
     
     from_menu = cmds.optionMenu(label="From Renderer:")
     cmds.menuItem(label="Arnold")
