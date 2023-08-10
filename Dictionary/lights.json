@@ -34,7 +34,7 @@
             "renderer" : ["arnold","renderman","vray","cycles"],
             "name" : ["aiSkyDomeLight","PxrDomeLight","VRayLightDomeShape","ShaderNodeTexEnvironment"],
             "attribute_intensity" : ["intensity","intensity","intensity","strength"],
-            "attribute_color" : ["color","lightColor","color","color"],
+            "attribute_color" : ["color","lightColorMap","domeTex","color"],
             "attribute_exposure" : ["aiExposure","exposure","",""]
         },
         "mesh_light" : {

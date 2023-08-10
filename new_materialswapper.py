@@ -151,10 +151,6 @@ def copyMaterialAttributes(material, materialsData, material_type, number, convN
                 
                 else:
                     try:
-                        cmds.setAttr(convMaterial_new, value)
-                    except:
-                        cmds.setAttr(convMaterial_new, value[0][0], value[0][1], value[0][2], type='double3')
-                    finally:
                         if file_node:
                             file_path = cmds.listConnections(attribute)
                             file_path = ''.join(file_path)
@@ -164,6 +160,14 @@ def copyMaterialAttributes(material, materialsData, material_type, number, convN
                                 cmds.connectAttr(file_path + '.outAlpha', convMaterial_new)
                             finally:
                                 cmds.connectAttr(file_path + '.outValue', convMaterial_new)
+
+                        else:        
+                            cmds.setAttr(convMaterial_new, value)
+
+                    except:
+                        cmds.setAttr(convMaterial_new, value[0][0], value[0][1], value[0][2], type='double3')
+                    finally:
+                        continue
 
             else:
                 try:
