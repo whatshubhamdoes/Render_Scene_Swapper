@@ -27,98 +27,59 @@ def assignNumber(currentRenderer):
     else:
         return False 
 
-def createLightComponentMap(components_light_map,lightsData,light_type,number):
-    for light in lightsData["Lights"]:
-        if light != "renderer":
-            for key,value in lightsData["Lights"][light_type].items():
-                if key in ["attribute_intensity","attribute_color","attribute_exposure"]:
-                    components_light_map[key]=value[number]
-
 def copyLightAttributes(light,lightsData,light_type,number,convNumber):
+    try:
+        a_intensity = lightsData["Lights"][f"{light_type}"]["attribute_intensity"][number]
+        intensity=cmds.connectionInfo(f"{light}.{a_intensity}")
+    except:
+        a_intensity = lightsData["Lights"][f"{light_type}"]["attribute_intensity"][number]
+        intensity=cmds.getAttr(f"{light}.{a_intensity}")
+    finally:
+        pass
+    try:
+        a_color = lightsData["Lights"][f"{light_type}"]["attribute_color"][number]
+        l_color = cmds.connectionInfo(f"{light}.{a_color}")
+    except:
+        a_color = lightsData["Lights"][f"{light_type}"]["attribute_color"][number]
+        l_color = cmds.getAttr(f"{light}.{a_color}")
+    finally:
+        pass
+    try:
+        a_exposure = lightsData["Lights"][f"{light_type}"]["attribute_exposure"][number]
+        exposure = cmds.connectionInfo(f"{light}.{a_exposure}")
+    except:
+        a_exposure = lightsData["Lights"][f"{light_type}"]["attribute_exposure"][number]
+        exposure = cmds.getAttr(f"{light}.{a_exposure}")
+    finally:
+        pass
     convLight=lightsData["Lights"][light_type]["name"][convNumber]
     print(convLight)
     convLight=cmds.shadingNode(f"{convLight}",asLight=True,name=f"{light}_conv")
-    
-    components_light_map={}
-    createLightComponentMap(components_light_map,lightsData,light_type,number)
-    print(components_light_map)
+    try:
+        a_intensity = lightsData["Lights"][f"{light_type}"]["attribute_intensity"][convNumber]
+        cmds.connectAttr(intensity,f"{convLight}.{a_intensity}")
+    except:
+        a_intensity = lightsData["Lights"][f"{light_type}"]["attribute_intensity"][convNumber]
+        cmds.setAttr(f"{convLight}.{a_intensity}", intensity)
+    finally:
+        pass
+    try:
+        a_color = lightsData["Lights"][f"{light_type}"]["attribute_color"][convNumber]
+        cmds.connectAttr(l_color,f"{convLight}.{a_color}")
+    except:
+        a_color = lightsData["Lights"][f"{light_type}"]["attribute_color"][convNumber]
+        cmds.setAttr(f"{convLight}.{a_color}", l_color[0][0], l_color[0][1], l_color[0][2], type="double3")
+    finally:
+        pass
+    try:
+        a_exposure = lightsData["Lights"][f"{light_type}"]["attribute_exposure"][convNumber] 
+        cmds.connectAttr(exposure,f"{convLight}.{a_exposure}")
+    except:
+        a_exposure = lightsData["Lights"][f"{light_type}"]["attribute_exposure"][convNumber] 
+        cmds.setAttr(f"{convLight}.{a_exposure}", exposure)
+    finally:
+        pass
 
-    components_convLight_map={}
-    createLightComponentMap(components_convLight_map,lightsData,light_type,convNumber)
-    print(components_convLight_map)
-
-    for attr,convAttr in zip(components_light_map.values(),components_convLight_map.values()):
-        try:
-            value=cmds.getAttr(light+'.'+attr)
-            print(value)
-            file_node=cmds.connectionInfo(light + '.'+ attr, sourceFromDestination=True)
-            print(file_node)
-            file_node=''.join(file_node)
-            try:
-                print("inside file node")
-                if convNumber==1:
-                    if number==0:
-                        print("Coming in arnold to renderman_file_node")
-                        file_path=cmds.listConnections(light + '.'+ attr,type='file')
-                        file_path=''.join(file_path)
-                        file_path=cmds.getAttr("%s.fileTextureName" % file_path)
-                        print(file_path)
-                        cmds.setAttr(convLight+'.'+convAttr,file_path,type='string')
-                    else:
-                        print("Coming in vray to renderman_file_node")
-                        file_path=cmds.listConnections(light + '.'+ attr,type='file')
-                        file_path=''.join(file_path)
-                        file_path=cmds.getAttr("%s.fileTextureName" % file_path)
-                        print(file_path)
-                        cmds.setAttr(convLight+'.'+convAttr,file_path,type='string')
-
-                if convNumber==2:
-                    if number == 0:
-                        print("Coming in arnold to vray_file_node")
-                        file_path=cmds.listConnections(light + '.'+ attr,type='file')
-                        file_path=''.join(file_path)
-                        print(file_path)
-                        cmds.setAttr(convLight+'.useDomeTex',1)
-                        cmds.connectAttr(file_path+'.outColor',convLight+'.'+convAttr)
-                    else:
-                        print("Coming in renderman to vray_file_node")
-                        cmds.setAttr(convLight+'.useDomeTex',1)
-                        new_file_node=cmds.shadingNode('file',asTexture=True)
-                        cmds.setAttr(new_file_node+'.fileTextureName',value,type='string')
-                        cmds.connectAttr(new_file_node+'.outColor',convLight+'.'+convAttr)     
-
-                if convNumber==0:
-                    print("To arnold")
-                    if number == 2:
-                        print("Coming in vray to arnold")
-                        file_path=cmds.listConnections(light + '.'+ attr,type='file')
-                        file_path=''.join(file_path)
-                        cmds.connectAttr(file_path+'.outColor',convLight+'.'+convAttr)
-                    else:
-                        print("Coming in renderman to arnold")
-                        new_file_node=cmds.shadingNode('file',asTexture=True)
-                        print("created new node")
-                        cmds.setAttr(new_file_node+'.fileTextureName',value,type='string')
-                        cmds.connectAttr(new_file_node+'.outColor',convLight+'.'+convAttr)     
-            
-            except:
-                try:
-                    try:
-                        cmds.setAttr(convLight+'.'+convAttr,value)
-                    except:
-                        cmds.setAttr(convLight+'.'+convAttr,value[0][0],value[0][1],value[0][2],type='double3')
-                    finally:
-                        pass
-                except:            
-                    if '' in attr.lower():
-                        continue
-        
-        except:
-            if '' in attr.lower():
-                continue
-        
-        
-    
     lightTransform=cmds.listRelatives(light,parent=True,shapes=True,fullPath=True)
     cmds.matchTransform(f"{convLight}", lightTransform)
     lightSet=cmds.listRelatives(lightTransform,parent=True,fullPath=True)
