@@ -32,7 +32,7 @@ def createMaterialComponentMap(components_material_map,materialsData,material_ty
     for material in materialsData["Materials"]:
         if material != "renderer":
             for key,value in materialsData["Materials"][material_type].items():
-                if key in ["attribute_diffuse_color", "attribute_specular_color", "attribute_roughness", "attribute_metalness", "attribute_opacity", "attribute_normal_map", "attribute_displacement", "attribute_emissive_color", "attribute_transparency", "attribute_ambient_occlusion"]:
+                if key in ["attribute_base", "attribute_diffuse_color", "attribute_metalness", "attribute_specular", "attribute_specular_color", "attribute_specular_roughness", "attribute_transmission", "attribute_transmission_color", "attribute_subsurface", "attribute_subsurface_color", "attribute_subsurface_radius", "attribute_subsurface_scale", "attribute_subsurface_anisotropy", "attribute_coat", "attribute_coat_color", "attribute_coat_roughness", "attribute_coat_anisotropy", "attribute_sheen", "attribute_sheen_color", "attribute_sheen_roughness", "attribute_emission", "attribute_emission_color", "attribute_normal_map"]:
                     components_material_map[key]= value[number]
 
 
@@ -40,7 +40,10 @@ def copyMaterialAttributes(material, materialsData, material_type, number, convN
     convMaterial = materialsData["Materials"][material_type]["name"][convNumber]
     print(convMaterial)
     convMaterial = cmds.shadingNode(f"{convMaterial}", asShader=True, name=f"{material}_conv")
+    print(convMaterial) 
+    # Naming wrong of shading group
     convMaterialShadingGroup = cmds.sets(convMaterial, renderable=True, noSurfaceShader=True, empty=True, name=convMaterial + 'SG')
+    print(convMaterialShadingGroup)
     cmds.connectAttr(convMaterial + '.outColor', convMaterialShadingGroup + '.surfaceShader', force=True)
     
     components_material_map = {}
@@ -53,7 +56,15 @@ def copyMaterialAttributes(material, materialsData, material_type, number, convN
     
     for attr, convAttr in zip(components_material_map.values(), components_convMaterial_map.values()):
         print("entered for loop")
-        
+        try:
+            value=cmds.getAttr(material+'.'+attr)
+            print(value)
+            file_node=cmds.connectionInfo(material+'.'+attr,sourceFromDestination=True)
+            print(file_node)
+            file_node=''.join(file_node)
+        except:
+            pass
+
     return convMaterialShadingGroup
 
 
@@ -69,8 +80,7 @@ def materialsConversion(convNumber):
         return
 
     material_conversion_map = {
-        materialsData["Materials"]["standard_material"]["name"][number] : "standard_material",
-        materialsData["Materials"]["hair_material"]["name"][number] : "hair_material"
+        materialsData["Materials"]["standard_material"]["name"][number] : "standard_material"
     }
 
     for obj in sel:
@@ -88,11 +98,14 @@ def materialsConversion(convNumber):
                     for mat in material:
                         material_type=cmds.nodeType(mat)
                         print(material_type)
+                        print("check")
                         if material_type in material_conversion_map :
+                            print("check2")
                             material_type=material_conversion_map[material_type]
                             print(material_type)
+                            print("check3")
                             shading_group= copyMaterialAttributes(material, materialsData, material_type, number, convNumber)
-                        cmds.sets(object,edit=True,forceElement=shading_group)
+                            cmds.sets(object,edit=True,forceElement=shading_group)
 
 
 

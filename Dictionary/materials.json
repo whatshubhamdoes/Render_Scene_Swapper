@@ -26,8 +26,7 @@
             "attribute_sheen_roughness":["sheenRoughness","","",""],
             "attribute_emission":["emission","","",""],
             "attribute_emission_color": ["emissionColor", "emitColor", "illumColor", "Emission"],
-            "attribute_normal_map": ["normalCamera", "bumpNormal", "bumpMap", "Normal"],
-            "attribute_displacement": ["displacementShader", "displacementShader", "displacementShader", "Displacement"]
+            "attribute_normal_map": ["normalCamera", "bumpNormal", "bumpMap", "Normal"]
         }
     }
 }
