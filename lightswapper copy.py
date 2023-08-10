@@ -82,31 +82,23 @@ def copyLightAttributes(light,lightsData,light_type,number,convNumber):
                         cmds.connectAttr(file_path+'.outColor',convLight+'.'+convAttr)
                     else:
                         print("Coming in renderman to vray_file_node")
-                        file_path=cmds.listConnections(light + '.'+ attr,type='string')
-                        file_path=''.join(file_path)
-                        print(file_path)
-                        file_path=cmds.getAttr("%s.fileTextureName" % file_path)
-                        print(file_path)
                         cmds.setAttr(convLight+'.useDomeTex',1)
                         new_file_node=cmds.shadingNode('file',asTexture=True)
-                        cmds.setAttr(new_file_node+'.fileTextureName',file_path,type='string')
+                        cmds.setAttr(new_file_node+'.fileTextureName',value,type='string')
                         cmds.connectAttr(new_file_node+'.outColor',convLight+'.'+convAttr)     
 
                 if convNumber==0:
-                    if number ==2:
+                    print("To arnold")
+                    if number == 2:
                         print("Coming in vray to arnold")
                         file_path=cmds.listConnections(light + '.'+ attr,type='file')
                         file_path=''.join(file_path)
                         cmds.connectAttr(file_path+'.outColor',convLight+'.'+convAttr)
                     else:
                         print("Coming in renderman to arnold")
-                        file_path=cmds.listConnections(light + '.'+ attr,type='string')
-                        file_path=''.join(file_path)
-                        print(file_path)
-                        file_path=cmds.getAttr("%s.fileTextureName" % file_path)
-                        print(file_path)
                         new_file_node=cmds.shadingNode('file',asTexture=True)
-                        cmds.setAttr(new_file_node+'.fileTextureName',file_path,type='string')
+                        print("created new node")
+                        cmds.setAttr(new_file_node+'.fileTextureName',value,type='string')
                         cmds.connectAttr(new_file_node+'.outColor',convLight+'.'+convAttr)     
             
             except:
