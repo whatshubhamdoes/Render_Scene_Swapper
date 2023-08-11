@@ -196,28 +196,51 @@ def copyMaterialAttributes(mat, materialsData, material_type, number, convNumber
             file_node=''.join(file_node)
             print("file_node = ",file_node)
             if "emissionColor" in attr:
-                if value != 0:
-                    
-            if file_node != "":
+                emissiongain=cmds.getAttr(mat+'.emission')
+                if emissiongain != 0.0 :
+                    print(emissiongain)
+                    print("entered emission")
+                    if file_node != "":
+                        print("entered emission file node")
+                        convMaterial=''.join(convMaterial)
+                        print("if file_node is true: convMaterial = ", convMaterial)
+                        cmds.connectAttr(file_node,convMaterial+'.'+convAttr)
+            
+                    else:
+                        print("entering emission value set")
+                        try:
+                            try:
+                                cmds.setAttr(convMaterial+'.'+convAttr,value)
+                                print("Value set 1st try")
+                            except:
+                                cmds.setAttr(convMaterial+'.'+convAttr,value[0][0],value[0][1],value[0][2],type='double3')
+                                print("Value set 2nd try")
+                            finally:
+                                print("Not Set = ", attr)
+                        except:            
+                            if '' in convAttr.lower():
+                                continue   
+                else:
+                    continue
+            else:
+                if file_node != "":
                     convMaterial=''.join(convMaterial)
                     print("if file_node is true: convMaterial = ", convMaterial)
                     cmds.connectAttr(file_node,convMaterial+'.'+convAttr)
-            
-            else:
-                try:
+        
+                else:
                     try:
-                        cmds.setAttr(convMaterial+'.'+convAttr,value)
-                        print("Value set 1st try")
-                    except:
-                        cmds.setAttr(convMaterial+'.'+convAttr,value[0][0],value[0][1],value[0][2],type='double3')
-                        print("Value set 2nd try")
-                    finally:
-                        print("Not Set = ", attr)
-                except:            
-                    if '' in convAttr.lower():
-                        continue
-                
-
+                        try:
+                            cmds.setAttr(convMaterial+'.'+convAttr,value)
+                            print("Value set 1st try")
+                        except:
+                            cmds.setAttr(convMaterial+'.'+convAttr,value[0][0],value[0][1],value[0][2],type='double3')
+                            print("Value set 2nd try")
+                        finally:
+                            print("Done  = ", attr)
+                    except:            
+                        if '' in convAttr.lower():
+                            continue
         except:
             pass
     
