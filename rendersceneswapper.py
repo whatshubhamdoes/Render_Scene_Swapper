@@ -329,20 +329,29 @@ def createUI():
     if cmds.window(window_name, exists=True):
         cmds.deleteUI(window_name)
         
-    cmds.window(window_name, title="Universal Renderer Scene Swapper : Maya", widthHeight=(500, 400))
+    cmds.window(window_name, title="Renderer Scene Swapper : Maya", widthHeight=(500, 300))
+
+    #cmds.columnLayout()
+    #cmds.image( image='/transfer/s5512613_SP/Masters_Projects/Maya_Files/images/logo_renderer_scene_swapper' )
+    #cmds.separator(height=40, style='shelf')
+
 
     # Creating two optionMenus to choose the conversion from and to renderers for materials
-    layout = cmds.columnLayout(adjustableColumn=True, width=500, columnAlign="center")  # Set width and alignment
+    cmds.columnLayout(adjustableColumn=True, width=500, columnAlign="center")  # Set width and alignment
     
-    # Select Materials Label
-    cmds.text(label="Please select all the materials and then select the conversion function:", align="center")  # Center align
+    cmds.text(label=" Renderer Scene Swapper ", align="center", backgroundColor=[0.275, 0.312, 30.707])  # Center align with background color
+    cmds.separator(height=10, style='single')
+
+    # Materials Conversion Section
+    cmds.text(label=" Materials Conversion ", align="center", backgroundColor=[0.0, 0.3, 0.3])  # Center align with background color
+    cmds.text(label="Please select all the objects and then select the conversion function:", align="center", backgroundColor=[0.0, 0.2, 0.2])  # Center align
     
-    from_material_menu = cmds.optionMenu(label="From :")
+    from_material_menu = cmds.optionMenu(label="From :", backgroundColor=[0.2, 0.2, 0.2])
     cmds.menuItem(label="Arnold")
     cmds.menuItem(label="Renderman")
     cmds.menuItem(label="VRay")
     
-    to_material_menu = cmds.optionMenu(label="To   :")
+    to_material_menu = cmds.optionMenu(label="To   :", backgroundColor=[0.2, 0.2, 0.2])
     cmds.menuItem(label="Arnold")
     cmds.menuItem(label="Renderman")
     cmds.menuItem(label="VRay")
@@ -351,17 +360,18 @@ def createUI():
     cmds.button(label="Convert", command=convert_selected_materials)
     
     # Create a separator
-    cmds.separator()
+    cmds.separator(height=40, style='shelf')
+
+    # Lights Conversion Section
+    cmds.text(label=" Lights Conversion ", align="center", backgroundColor=[0.3, 0.3, 0.0])  # Center align with background color
+    cmds.text(label="Please select all the lights and then select the conversion function:", align="center", backgroundColor=[0.2, 0.2, 0.0])  # Center align
     
-    # Select Lights Label
-    cmds.text(label="Please select all the lights and then select the conversion function:", align="center")  # Center align
-    
-    from_light_menu = cmds.optionMenu(label="From :")
+    from_light_menu = cmds.optionMenu(label="From :", backgroundColor=[0.2, 0.2, 0.2])
     cmds.menuItem(label="Arnold")
     cmds.menuItem(label="Renderman")
     cmds.menuItem(label="VRay")
     
-    to_light_menu = cmds.optionMenu(label="To   :")
+    to_light_menu = cmds.optionMenu(label="To   :", backgroundColor=[0.2, 0.2, 0.2])
     cmds.menuItem(label="Arnold")
     cmds.menuItem(label="Renderman")
     cmds.menuItem(label="VRay")
