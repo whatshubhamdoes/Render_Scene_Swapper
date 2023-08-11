@@ -10,6 +10,36 @@ def getCurrentRenderer():
     currentRenderer = cmds.getAttr('defaultRenderGlobals.currentRenderer')
     return currentRenderer
 
+def getCurrentRenderAttributes():
+    # Replace "Arnold" with the name of the renderer you're using
+    render_settings_node = "defaultRenderGlobals"
+
+    # List all attributes of the render settings node
+    attributes = cmds.listAttr(render_settings_node)
+
+    # Print the attribute names and values
+    for attr in attributes:
+        # Skip message attributes
+        attr_type = cmds.getAttr(render_settings_node + '.' + attr, type=True)
+        if attr_type == 'message':
+            continue
+            
+        print("Attribute Name:", attr)
+        
+        # Query the attribute value
+        value = cmds.getAttr(render_settings_node + '.' + attr)
+        print("Attribute Value:", value)
+
+def setRenderer(from_index):
+    if from_index == 0:
+        cmds.setAttr("defaultRenderGlobals.currentRenderer", "arnold", type="string")
+    elif from_index ==1:
+        cmds.setAttr("defaultRenderGlobals.currentRenderer", "renderman", type="string")
+    elif from_index ==2:
+        cmds.setAttr("defaultRenderGlobals.currentRenderer", "vray", type="string")
+    else:
+        print("Not able to change renderer")
+
 def checkCurrentRenderer(currentRenderer):
     with open('/transfer/s5512613_SP/Masters_Project/Render_Scene_Swapper/Dictionary/lights.json','r') as file :
         lightsData=json.load(file)
@@ -165,7 +195,9 @@ def copyMaterialAttributes(mat, materialsData, material_type, number, convNumber
             file_node=cmds.connectionInfo(mat+'.'+attr,sourceFromDestination=True)
             file_node=''.join(file_node)
             print("file_node = ",file_node)
-            
+            if "emissionColor" in attr:
+                if value != 0:
+                    
             if file_node != "":
                     convMaterial=''.join(convMaterial)
                     print("if file_node is true: convMaterial = ", convMaterial)
@@ -306,6 +338,7 @@ def createUI():
             to_index = conversion_map.get(to_renderer)
             
             if from_index is not None and to_index is not None:
+                setRenderer(from_index)
                 convertMaterials(from_index, to_index)
                 
     def convert_selected_lights(*args):
@@ -324,6 +357,7 @@ def createUI():
             
             if from_index is not None and to_index is not None:
                 convertLights(from_index, to_index)
+                setRenderer(to_index)
     
     window_name = "Renderer_Scene_Swapper"
     if cmds.window(window_name, exists=True):
