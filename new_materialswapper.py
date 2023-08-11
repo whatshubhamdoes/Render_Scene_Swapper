@@ -36,13 +36,16 @@ def createMaterialComponentMap(components_material_map,materialsData,material_ty
                     components_material_map[key]= value[number]
 
 
-def copyMaterialAttributes(material, materialsData, material_type, number, convNumber):
+def copyMaterialAttributes(mat, materialsData, material_type, number, convNumber):
     convMaterial = materialsData["Materials"][material_type]["name"][convNumber]
+    print("First Conv Material")
     print(convMaterial)
-    convMaterial = cmds.shadingNode(f"{convMaterial}", asShader=True, name=f"{material}_conv")
+    convMaterial = cmds.shadingNode(f"{convMaterial}", asShader=True, name=f"{mat}_conv")
+    print("Second Conv Material")
     print(convMaterial) 
     # Naming wrong of shading group
     convMaterialShadingGroup = cmds.sets(convMaterial, renderable=True, noSurfaceShader=True, empty=True, name=convMaterial + 'SG')
+    print("Conv material shading group")
     print(convMaterialShadingGroup)
     cmds.connectAttr(convMaterial + '.outColor', convMaterialShadingGroup + '.surfaceShader', force=True)
     
@@ -57,14 +60,39 @@ def copyMaterialAttributes(material, materialsData, material_type, number, convN
     for attr, convAttr in zip(components_material_map.values(), components_convMaterial_map.values()):
         print("entered for loop")
         try:
-            value=cmds.getAttr(material+'.'+attr)
-            print(value)
-            file_node=cmds.connectionInfo(material+'.'+attr,sourceFromDestination=True)
-            print(file_node)
+            print("attr = " , attr)
+            print("convAttr = ", convAttr)
+            value=cmds.getAttr(mat+'.'+attr)
+            print("value = ",value)
+            file_node=cmds.connectionInfo(mat+'.'+attr,sourceFromDestination=True)
             file_node=''.join(file_node)
+            print("file_node = ",file_node)
+            
+            if file_node != "":
+                    convMaterial=''.join(convMaterial)
+                    print("if file_node is true: convMaterial = ", convMaterial)
+                    cmds.connectAttr(file_node,convMaterial+'.'+convAttr)
+            
+            else:
+                try:
+                    try:
+                        cmds.setAttr(convMaterial+'.'+convAttr,value)
+                        print("Value set 1st try")
+                    except:
+                        cmds.setAttr(convMaterial+'.'+convAttr,value[0][0],value[0][1],value[0][2],type='double3')
+                        print("Value set 2nd try")
+                    finally:
+                        print("Not Set = ", attr)
+                except:            
+                    if '' in convAttr.lower():
+                        continue
+                
+
         except:
             pass
-
+    
+    print("before returning conv material shading group = ")
+    print(convMaterialShadingGroup)
     return convMaterialShadingGroup
 
 
@@ -104,8 +132,14 @@ def materialsConversion(convNumber):
                             material_type=material_conversion_map[material_type]
                             print(material_type)
                             print("check3")
-                            shading_group= copyMaterialAttributes(material, materialsData, material_type, number, convNumber)
+                            shading_group= copyMaterialAttributes(mat, materialsData, material_type, number, convNumber)
                             cmds.sets(object,edit=True,forceElement=shading_group)
+                        else :
+                            if "displacementShader" in material_type:
+                                print("mat = ", mat)
+                                cmds.connectAttr(mat+'.displacement',shading_group+'.displacementShader')
+                            else:
+                                continue
 
 
 
