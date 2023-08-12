@@ -324,9 +324,7 @@ def materialsConversion(convNumber,material_conversion_map,materialDictionaryAdd
                                     cmds.warning("Error : Please check the material of your selected object")
                                     return
                             else:
-                                cmds.confirmDialog(title='Error', message='Please check the material of your selected object', button=['OK'], defaultButton='OK')
-                                cmds.warning("Error : Please check the material of your selected object")
-                                return
+                                continue
                                 
 
 def convertLights(fromNumber,convNumber):
