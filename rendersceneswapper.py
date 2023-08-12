@@ -81,7 +81,8 @@ def createMaterialComponentMap(components_material_map,materialsData,material_ty
 def copyLightAttributes(light,lightsData,light_type,number,convNumber):
     convLight=lightsData["Lights"][light_type]["name"][convNumber]
     print(convLight)
-    convLight=cmds.shadingNode(f"{convLight}",asLight=True,name=f"{light}_conv")
+    conv=lightsData["Lights"][light_type]["renderer"][convNumber]
+    convLight=cmds.shadingNode(f"{convLight}",asLight=True,name=f"{light}_{conv}")
     
     components_light_map={}
     createLightComponentMap(components_light_map,lightsData,light_type,number)
@@ -173,7 +174,8 @@ def copyMaterialAttributes(mat, materialsData, material_type, number, convNumber
     convMaterial = materialsData["Materials"][material_type]["name"][convNumber]
     print("First Conv Material")
     print(convMaterial)
-    convMaterial = cmds.shadingNode(f"{convMaterial}", asShader=True, name=f"{mat}_conv")
+    conv= materialsData["Materials"][material_type]["renderer"][convNumber]
+    convMaterial = cmds.shadingNode(f"{convMaterial}", asShader=True, name=f"{mat}_{conv}")
     print("Second Conv Material")
     print(convMaterial) 
     # Naming wrong of shading group
