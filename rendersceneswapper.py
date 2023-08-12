@@ -276,9 +276,7 @@ def lightsConversion(convNumber,light_conversion_map,lightDictionaryAddress):
                 print(light_type)
                 copyLightAttributes(light, lightsData, light_type, number, convNumber)
             else:
-                cmds.confirmDialog(title='Error', message='Please check the type of light.', button=['OK'], defaultButton='OK')
-                cmds.warning("Error : Please check the type of light.")
-                return
+                continue
 
 def materialsConversion(convNumber,material_conversion_map,materialDictionaryAddress):
     with open(materialDictionaryAddress,'r') as file :
