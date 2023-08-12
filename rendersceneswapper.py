@@ -7,36 +7,25 @@ import sys
 import json
 
 def getCurrentRenderer():
-    currentRenderer = cmds.getAttr('defaultRenderGlobals.currentRenderer')
-    return currentRenderer
+    return cmds.getAttr('defaultRenderGlobals.currentRenderer')
 
-def getCurrentRenderAttributes():
-    # Replace "Arnold" with the name of the renderer you're using
-    render_settings_node = "defaultRenderGlobals"
 
-    # List all attributes of the render settings node
+def getCurrentRenderAttributes():  
+    render_settings_node = "defaultRenderGlobals" 
     attributes = cmds.listAttr(render_settings_node)
-
-    # Print the attribute names and values
-    for attr in attributes:
-        # Skip message attributes
+    for attr in attributes:        
         attr_type = cmds.getAttr(render_settings_node + '.' + attr, type=True)
         if attr_type == 'message':
             continue
             
         print("Attribute Name:", attr)
-        
-        # Query the attribute value
         value = cmds.getAttr(render_settings_node + '.' + attr)
         print("Attribute Value:", value)
 
 def setRenderer(from_index):
-    if from_index == 0:
-        cmds.setAttr("defaultRenderGlobals.currentRenderer", "arnold", type="string")
-    elif from_index ==1:
-        cmds.setAttr("defaultRenderGlobals.currentRenderer", "renderman", type="string")
-    elif from_index ==2:
-        cmds.setAttr("defaultRenderGlobals.currentRenderer", "vray", type="string")
+    renderers = ["arnold", "renderman", "vray"]
+    if 0 <= from_index < len(renderers):
+        cmds.setAttr("defaultRenderGlobals.currentRenderer", renderers[from_index], type="string")
     else:
         print("Not able to change renderer")
 
@@ -53,14 +42,8 @@ def checkCurrentRenderer(currentRenderer,anyDictionaryAddress):
                     return ("Renderer Supported")
 
 def assignNumber(currentRenderer):
-    if currentRenderer == "arnold" :
-        return 0
-    elif currentRenderer == "renderman" :
-        return 1
-    elif currentRenderer == "vray" :
-        return 2
-    else:
-        return False 
+    renderer_map = {"arnold": 0, "renderman": 1, "vray": 2}
+    return renderer_map.get(currentRenderer, False)
 
 
 def createLightComponentMap(components_light_map,lightsData,light_type,number):
@@ -416,17 +399,17 @@ def createUI():
 
 
     # Creating two optionMenus to choose the conversion from and to renderers for materials
-    cmds.columnLayout(adjustableColumn=True, width=500, columnAlign="center")  # Set width and alignment
+    cmds.columnLayout(adjustableColumn=True, width=500, height=265,columnAlign="center")  # Set width and alignment
     
     cmds.text(label=" Renderer Conversion Tool : Maya ", height=20,font="boldLabelFont",align="center", backgroundColor=[0.8, 0.8, 0.8])  # Center align with background color
-    cmds.text(label=" Note : Please make sure all the objects and lights are in a group. ", height=13,font="smallPlainLabelFont",align="center", backgroundColor=[0.8, 0.8, 0.8])  # Center align with background color
+    cmds.text(label=" Note : Please make sure all the objects and lights are in separate groups. ", height=13,font="smallPlainLabelFont",align="center", backgroundColor=[0.8, 0.8, 0.8])  # Center align with background color
     #cmds.image( image='/transfer/s5512613_SP/Masters_Projects/Maya_Files/images/logo_renderer_scene_swapper' )
     cmds.separator(height=10, style='single')
 
     cmds.columnLayout(adjustableColumn=True, width=500, columnAlign="center",bgc=[0.8,0.8,0.8])
     # Materials Conversion Section
     cmds.text(label=" Materials Conversion ", height = 25,font="smallBoldLabelFont",align="center", backgroundColor=[0.0, 0.0, 0.3])  # Center align with background color
-    cmds.text(label="Please select all the objects and then select the conversion function:", align="center", backgroundColor=[0.0, 0.0, 0.2])  # Center align
+    cmds.text(label="Please select the object group/groups or all the objects and then press the CONVERT button:", align="center", backgroundColor=[0.0, 0.0, 0.2])  # Center align
     
     from_material_menu = cmds.optionMenu(label="From :", backgroundColor=[0.2, 0.2, 0.2])
     cmds.menuItem(label="Arnold")
@@ -448,7 +431,7 @@ def createUI():
     cmds.columnLayout(adjustableColumn=True, width=500, columnAlign="center",bgc=[0.2,0.2,0.5])
     # Lights Conversion Section
     cmds.text(label=" Lights Conversion ", height = 25,font="smallBoldLabelFont",align="center", backgroundColor=[0.3, 0.3, 0.0])  # Center align with background color
-    cmds.text(label="Please select all the lights and then select the conversion function:", align="center", backgroundColor=[0.2, 0.2, 0.0])  # Center align
+    cmds.text(label="Please select the light group/groups or all the lights and then press the CONVERT button:", align="center", backgroundColor=[0.2, 0.2, 0.0])  # Center align
     
     from_light_menu = cmds.optionMenu(label="From :", backgroundColor=[0.2, 0.2, 0.2])
     cmds.menuItem(label="Arnold")
