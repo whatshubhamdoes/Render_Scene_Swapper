@@ -405,7 +405,7 @@ def createUI():
     if cmds.window(window_name, exists=True):
         cmds.deleteUI(window_name)
         
-    cmds.window(window_name, title="Renderer Conversion Tool : Maya", iconName="RCT",widthHeight=(500, 300),bgc=[0.1,0.1,0.1])
+    cmds.window(window_name, title="Renderer Conversion Tool : Maya", iconName="RCT",widthHeight=(500, 300))
 
     #cmds.columnLayout()
     #cmds.image( image='/transfer/s5512613_SP/Masters_Projects/Maya_Files/images/logo_renderer_scene_swapper' )
@@ -413,7 +413,7 @@ def createUI():
 
 
     # Creating two optionMenus to choose the conversion from and to renderers for materials
-    cmds.columnLayout(adjustableColumn=True, width=500, columnAlign="center",bgc=[0.2,0.2,0.5])  # Set width and alignment
+    cmds.columnLayout(adjustableColumn=True, width=500, columnAlign="center")  # Set width and alignment
     
     cmds.text(label=" Renderer Conversion Tool : Maya ", height=20,font="boldLabelFont",align="center", backgroundColor=[0.8, 0.8, 0.8])  # Center align with background color
     cmds.text(label=" Note : Please make sure all the objects and lights are in a group. ", height=13,font="smallPlainLabelFont",align="center", backgroundColor=[0.8, 0.8, 0.8])  # Center align with background color
@@ -422,8 +422,8 @@ def createUI():
 
     cmds.columnLayout(adjustableColumn=True, width=500, columnAlign="center",bgc=[0.8,0.8,0.8])
     # Materials Conversion Section
-    cmds.text(label=" Materials Conversion ", height = 25,font="smallBoldLabelFont",align="center", backgroundColor=[0.0, 0.3, 0.3])  # Center align with background color
-    cmds.text(label="Please select all the objects and then select the conversion function:", align="center", backgroundColor=[0.0, 0.2, 0.2])  # Center align
+    cmds.text(label=" Materials Conversion ", height = 25,font="smallBoldLabelFont",align="center", backgroundColor=[0.0, 0.0, 0.3])  # Center align with background color
+    cmds.text(label="Please select all the objects and then select the conversion function:", align="center", backgroundColor=[0.0, 0.0, 0.2])  # Center align
     
     from_material_menu = cmds.optionMenu(label="From :", backgroundColor=[0.2, 0.2, 0.2])
     cmds.menuItem(label="Arnold")
