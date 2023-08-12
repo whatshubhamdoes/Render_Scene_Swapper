@@ -393,17 +393,17 @@ def createUI():
         
     cmds.window(window_name, title="Renderer Conversion Tool : Maya", iconName="RCT",widthHeight=(500, 300))
 
-    #cmds.columnLayout()
-    #cmds.image( image='/transfer/s5512613_SP/Masters_Projects/Maya_Files/images/logo_renderer_scene_swapper' )
-    #cmds.separator(height=40, style='shelf')
+    #cmds.columnLayout(adjustableColumn=True,width=500, height=265)
+    #cmds.image( image='/transfer/s5512613_SP/Masters_Project/Render_Scene_Swapper/Images/logo_renderer_scene_swapper')
+    #cmds.separator(height=100, style='shelf')
 
 
     # Creating two optionMenus to choose the conversion from and to renderers for materials
-    cmds.columnLayout(adjustableColumn=True, width=500, height=265,columnAlign="center")  # Set width and alignment
+    cmds.columnLayout(adjustableColumn=True, width=505, height=265,columnAlign="center")  # Set width and alignment
     
     cmds.text(label=" Renderer Conversion Tool : Maya ", height=20,font="boldLabelFont",align="center", backgroundColor=[0.8, 0.8, 0.8])  # Center align with background color
     cmds.text(label=" Note : Please make sure all the objects and lights are in separate groups. ", height=13,font="smallPlainLabelFont",align="center", backgroundColor=[0.8, 0.8, 0.8])  # Center align with background color
-    #cmds.image( image='/transfer/s5512613_SP/Masters_Projects/Maya_Files/images/logo_renderer_scene_swapper' )
+    #cmds.image( image='/transfer/s5512613_SP/Masters_Project/Render_Scene_Swapper/Images/logo_renderer_scene_swapper' )
     cmds.separator(height=10, style='single')
 
     cmds.columnLayout(adjustableColumn=True, width=500, columnAlign="center",bgc=[0.8,0.8,0.8])
