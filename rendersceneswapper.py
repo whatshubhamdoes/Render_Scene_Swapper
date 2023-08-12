@@ -355,7 +355,8 @@ def convertMaterials(fromNumber,convNumber):
     print(currentRenderer)
     check1=checkCurrentRenderer(currentRenderer,materialDictionaryAddress)
     material_conversion_map = {
-        materialsData["Materials"]["standard_material"]["name"][fromNumber] : "standard_material"
+        materialsData["Materials"]["standard_material"]["name"][fromNumber] : "standard_material",
+        materialsData["Materials"]["hair_material"]["name"][fromNumber] : "hair_material"
     }
     if check1== "Renderer Supported":
         materialsConversion(convNumber,material_conversion_map,materialDictionaryAddress)

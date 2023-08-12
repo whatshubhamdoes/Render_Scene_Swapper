@@ -10,6 +10,7 @@
             "attribute_specular":["specular","specular","reflectionColorAmount"],
             "attribute_specular_color": ["specularColor", "specularTint", "reflectionColor"],
             "attribute_specular_roughness": ["specularRoughness", "roughness", "roughnessAmount"],
+            "attribute_ior":["specularIor","","refractionIOR"],
             "attribute_transmission":["transmission","",""],
             "attribute_transmission_color":["transmissionColor","",""],
             "attribute_subsurface":["subsurface","subsurface",""],
