@@ -40,12 +40,17 @@ def setRenderer(from_index):
     else:
         print("Not able to change renderer")
 
-def checkCurrentRenderer(currentRenderer):
-    with open('/transfer/s5512613_SP/Masters_Project/Render_Scene_Swapper/Dictionary/lights.json','r') as file :
-        lightsData=json.load(file)
-    for rendererInfo in lightsData["Lights"]["renderer"]:
-        if currentRenderer in rendererInfo:
-            return ("Renderer Supported")
+def checkCurrentRenderer(currentRenderer,anyDictionaryAddress):
+    with open(anyDictionaryAddress,'r') as file :
+        data=json.load(file)
+        try:
+            for rendererInfo in data["Lights"]["renderer"]:
+                if currentRenderer in rendererInfo:
+                    return ("Renderer Supported")
+        except:
+            for rendererInfo in data["Materials"]["renderer"]:
+                if currentRenderer in rendererInfo:
+                    return ("Renderer Supported")
 
 def assignNumber(currentRenderer):
     if currentRenderer == "arnold" :
@@ -248,8 +253,8 @@ def copyMaterialAttributes(mat, materialsData, material_type, number, convNumber
     print(convMaterialShadingGroup)
     return convMaterialShadingGroup
 
-def lightsConversion(convNumber):
-    with open('/transfer/s5512613_SP/Masters_Project/Render_Scene_Swapper/Dictionary/lights.json','r') as file :
+def lightsConversion(convNumber,light_conversion_map,lightDictionaryAddress):
+    with open(lightDictionaryAddress,'r') as file :
         lightsData=json.load(file)
     currentRenderer=getCurrentRenderer()    
     number=assignNumber(currentRenderer)
@@ -258,15 +263,6 @@ def lightsConversion(convNumber):
         cmds.confirmDialog(title='Error', message='Please select an object', button=['OK'], defaultButton='OK')
         cmds.warning("Error : Please select an object")
         return
-
-    light_conversion_map = {
-        lightsData["Lights"]["area_light"]["name"][number]: "area_light",
-        lightsData["Lights"]["point_light"]["name"][number]: "point_light",
-        lightsData["Lights"]["directional_light"]["name"][number]: "directional_light",
-        lightsData["Lights"]["spot_light"]["name"][number]: "spot_light",
-        lightsData["Lights"]["skyDome_light"]["name"][number]: "skyDome_light",
-        lightsData["Lights"]["mesh_light"]["name"][number]: "mesh_light"
-    }
 
     for obj in sel:
         lights = cmds.ls(sl=True, dag=True, s=True)
@@ -279,9 +275,13 @@ def lightsConversion(convNumber):
                 light_type = light_conversion_map[light_type]
                 print(light_type)
                 copyLightAttributes(light, lightsData, light_type, number, convNumber)
+            else:
+                cmds.confirmDialog(title='Error', message='Please check the type of light.', button=['OK'], defaultButton='OK')
+                cmds.warning("Error : Please check the type of light.")
+                return
 
-def materialsConversion(convNumber):
-    with open('/transfer/s5512613_SP/Masters_Project/Render_Scene_Swapper/Dictionary/materials.json','r') as file :
+def materialsConversion(convNumber,material_conversion_map,materialDictionaryAddress):
+    with open(materialDictionaryAddress,'r') as file :
         materialsData=json.load(file)
     currentRenderer=getCurrentRenderer()    
     number=assignNumber(currentRenderer)
@@ -290,10 +290,6 @@ def materialsConversion(convNumber):
         cmds.confirmDialog(title='Error', message='Please select an object', button=['OK'], defaultButton='OK')
         cmds.warning("Error : Please select an object")
         return
-
-    material_conversion_map = {
-        materialsData["Materials"]["standard_material"]["name"][number] : "standard_material"
-    }
 
     for obj in sel:
         objects=cmds.ls(sl=True,dag=True,s=True)
@@ -321,25 +317,50 @@ def materialsConversion(convNumber):
                         else :
                             if "displacementShader" in material_type:
                                 print("mat = ", mat)
-                                cmds.connectAttr(mat+'.displacement',shading_group+'.displacementShader')
+                                try:
+                                    cmds.connectAttr(mat+'.displacement',shading_group+'.displacementShader')
+                                except:
+                                    cmds.confirmDialog(title='Error', message='Please check the material of your selected object', button=['OK'], defaultButton='OK')
+                                    cmds.warning("Error : Please check the material of your selected object")
+                                    return
                             else:
-                                continue
+                                cmds.confirmDialog(title='Error', message='Please check the material of your selected object', button=['OK'], defaultButton='OK')
+                                cmds.warning("Error : Please check the material of your selected object")
+                                return
+                                
 
 def convertLights(fromNumber,convNumber):
+    lightDictionaryAddress="/transfer/s5512613_SP/Masters_Project/Render_Scene_Swapper/Dictionary/lights.json"
+    with open(lightDictionaryAddress,'r') as file :
+        lightsData=json.load(file)
     currentRenderer=getCurrentRenderer()
     print(currentRenderer)
-    check1=checkCurrentRenderer(currentRenderer)
+    check1=checkCurrentRenderer(currentRenderer,lightDictionaryAddress)
+    light_conversion_map = {
+        lightsData["Lights"]["area_light"]["name"][fromNumber]: "area_light",
+        lightsData["Lights"]["point_light"]["name"][fromNumber]: "point_light",
+        lightsData["Lights"]["directional_light"]["name"][fromNumber]: "directional_light",
+        lightsData["Lights"]["spot_light"]["name"][fromNumber]: "spot_light",
+        lightsData["Lights"]["skyDome_light"]["name"][fromNumber]: "skyDome_light",
+        lightsData["Lights"]["mesh_light"]["name"][fromNumber]: "mesh_light"
+    }
     if check1== "Renderer Supported":
-        lightsConversion(convNumber)
+        lightsConversion(convNumber,light_conversion_map,lightDictionaryAddress)
     else:
         print("Renderer not supported for conversion")
 
 def convertMaterials(fromNumber,convNumber):
+    materialDictionaryAddress="/transfer/s5512613_SP/Masters_Project/Render_Scene_Swapper/Dictionary/materials.json"
+    with open(materialDictionaryAddress,'r') as file :
+        materialsData=json.load(file)
     currentRenderer=getCurrentRenderer()
     print(currentRenderer)
-    check1=checkCurrentRenderer(currentRenderer)
+    check1=checkCurrentRenderer(currentRenderer,materialDictionaryAddress)
+    material_conversion_map = {
+        materialsData["Materials"]["standard_material"]["name"][fromNumber] : "standard_material"
+    }
     if check1== "Renderer Supported":
-        materialsConversion(convNumber)
+        materialsConversion(convNumber,material_conversion_map,materialDictionaryAddress)
     else:
         print("Renderer not supported for conversion")
 
@@ -363,6 +384,7 @@ def createUI():
             if from_index is not None and to_index is not None:
                 setRenderer(from_index)
                 convertMaterials(from_index, to_index)
+                setRenderer(to_index)
                 
     def convert_selected_lights(*args):
         from_renderer = cmds.optionMenu(from_light_menu, query=True, value=True)
@@ -379,6 +401,7 @@ def createUI():
             to_index = conversion_map.get(to_renderer)
             
             if from_index is not None and to_index is not None:
+                setRenderer(from_index)
                 convertLights(from_index, to_index)
                 setRenderer(to_index)
     
@@ -386,7 +409,7 @@ def createUI():
     if cmds.window(window_name, exists=True):
         cmds.deleteUI(window_name)
         
-    cmds.window(window_name, title="Renderer Scene Swapper : Maya", widthHeight=(500, 300))
+    cmds.window(window_name, title="Renderer Conversion Tool : Maya", iconName="RCT",widthHeight=(500, 300),bgc=[0.1,0.1,0.1])
 
     #cmds.columnLayout()
     #cmds.image( image='/transfer/s5512613_SP/Masters_Projects/Maya_Files/images/logo_renderer_scene_swapper' )
@@ -394,13 +417,16 @@ def createUI():
 
 
     # Creating two optionMenus to choose the conversion from and to renderers for materials
-    cmds.columnLayout(adjustableColumn=True, width=500, columnAlign="center")  # Set width and alignment
+    cmds.columnLayout(adjustableColumn=True, width=500, columnAlign="center",bgc=[0.2,0.2,0.5])  # Set width and alignment
     
-    cmds.text(label=" Renderer Scene Swapper ", align="center", backgroundColor=[0.275, 0.312, 30.707])  # Center align with background color
+    cmds.text(label=" Renderer Conversion Tool : Maya ", height=20,font="boldLabelFont",align="center", backgroundColor=[0.8, 0.8, 0.8])  # Center align with background color
+    cmds.text(label=" Note : Please make sure all the objects and lights are in a group. ", height=13,font="smallPlainLabelFont",align="center", backgroundColor=[0.8, 0.8, 0.8])  # Center align with background color
+    #cmds.image( image='/transfer/s5512613_SP/Masters_Projects/Maya_Files/images/logo_renderer_scene_swapper' )
     cmds.separator(height=10, style='single')
 
+    cmds.columnLayout(adjustableColumn=True, width=500, columnAlign="center",bgc=[0.8,0.8,0.8])
     # Materials Conversion Section
-    cmds.text(label=" Materials Conversion ", align="center", backgroundColor=[0.0, 0.3, 0.3])  # Center align with background color
+    cmds.text(label=" Materials Conversion ", height = 25,font="smallBoldLabelFont",align="center", backgroundColor=[0.0, 0.3, 0.3])  # Center align with background color
     cmds.text(label="Please select all the objects and then select the conversion function:", align="center", backgroundColor=[0.0, 0.2, 0.2])  # Center align
     
     from_material_menu = cmds.optionMenu(label="From :", backgroundColor=[0.2, 0.2, 0.2])
@@ -416,11 +442,13 @@ def createUI():
     # Convert Button for Materials
     cmds.button(label="Convert", command=convert_selected_materials)
     
+    cmds.columnLayout(adjustableColumn=True, width=500, columnAlign="center",bgc=[0.8,0.8,0.8])
     # Create a separator
-    cmds.separator(height=40, style='shelf')
+    cmds.separator(height=5, style='shelf')
 
+    cmds.columnLayout(adjustableColumn=True, width=500, columnAlign="center",bgc=[0.2,0.2,0.5])
     # Lights Conversion Section
-    cmds.text(label=" Lights Conversion ", align="center", backgroundColor=[0.3, 0.3, 0.0])  # Center align with background color
+    cmds.text(label=" Lights Conversion ", height = 25,font="smallBoldLabelFont",align="center", backgroundColor=[0.3, 0.3, 0.0])  # Center align with background color
     cmds.text(label="Please select all the lights and then select the conversion function:", align="center", backgroundColor=[0.2, 0.2, 0.0])  # Center align
     
     from_light_menu = cmds.optionMenu(label="From :", backgroundColor=[0.2, 0.2, 0.2])
@@ -433,6 +461,7 @@ def createUI():
     cmds.menuItem(label="Renderman")
     cmds.menuItem(label="VRay")
     
+    cmds.columnLayout(adjustableColumn=True, width=500, columnAlign="center",bgc=[0.8,0.8,0.8])
     # Convert Button for Lights
     cmds.button(label="Convert", command=convert_selected_lights)
     
