@@ -16,8 +16,7 @@ def getCurrentRenderAttributes():
     for attr in attributes:        
         attr_type = cmds.getAttr(render_settings_node + '.' + attr, type=True)
         if attr_type == 'message':
-            continue
-            
+            continue            
         print("Attribute Name:", attr)
         value = cmds.getAttr(render_settings_node + '.' + attr)
         print("Attribute Value:", value)
@@ -28,6 +27,11 @@ def setRenderer(from_index):
         cmds.setAttr("defaultRenderGlobals.currentRenderer", renderers[from_index], type="string")
     else:
         print("Not able to change renderer")
+
+def conversionComplete(convertor):
+    cmds.confirmDialog(title='Conversion Complete', message='Conversion Complete of all the selected ' f"{convertor}", button=['OK'], defaultButton='OK')
+    cmds.warning("Conversion Complete of all the selected ",convertor)
+    return
 
 def checkCurrentRenderer(currentRenderer,anyDictionaryAddress):
     with open(anyDictionaryAddress,'r') as file :
@@ -83,68 +87,82 @@ def copyLightAttributes(light,lightsData,light_type,number,convNumber):
             print(file_node)
             file_node=''.join(file_node)
             try:
-                print("inside file node")
-                if convNumber==1:
-                    if number==0:
-                        print("Coming in arnold to renderman_file_node")
-                        file_path=cmds.listConnections(light + '.'+ attr,type='file')
-                        file_path=''.join(file_path)
-                        file_path=cmds.getAttr("%s.fileTextureName" % file_path)
-                        print(file_path)
-                        cmds.setAttr(convLight+'.'+convAttr,file_path,type='string')
-                    else:
-                        print("Coming in vray to renderman_file_node")
-                        file_path=cmds.listConnections(light + '.'+ attr,type='file')
-                        file_path=''.join(file_path)
-                        file_path=cmds.getAttr("%s.fileTextureName" % file_path)
-                        print(file_path)
-                        cmds.setAttr(convLight+'.'+convAttr,file_path,type='string')
+                if file_node != "":
+                    print("inside file node")
+                    if convNumber==1:
+                        if number==0:
+                            print("Coming in arnold to renderman_file_node")
+                            file_path=cmds.listConnections(light + '.'+ attr,type='file')
+                            file_path=''.join(file_path)
+                            file_path=cmds.getAttr("%s.fileTextureName" % file_path)
+                            print(file_path)
+                            cmds.setAttr(convLight+'.'+convAttr,file_path,type='string')
+                        else:
+                            print("Coming in vray to renderman_file_node")
+                            file_path=cmds.listConnections(light + '.'+ attr,type='file')
+                            file_path=''.join(file_path)
+                            file_path=cmds.getAttr("%s.fileTextureName" % file_path)
+                            print(file_path)
+                            cmds.setAttr(convLight+'.'+convAttr,file_path,type='string')
 
-                if convNumber==2:
-                    if number == 0:
-                        print("Coming in arnold to vray_file_node")
-                        file_path=cmds.listConnections(light + '.'+ attr,type='file')
-                        file_path=''.join(file_path)
-                        print(file_path)
-                        cmds.setAttr(convLight+'.useDomeTex',1)
-                        cmds.connectAttr(file_path+'.outColor',convLight+'.'+convAttr)
-                    else:
-                        print("Coming in renderman to vray_file_node")
-                        cmds.setAttr(convLight+'.useDomeTex',1)
-                        new_file_node=cmds.shadingNode('file',asTexture=True)
-                        cmds.setAttr(new_file_node+'.fileTextureName',value,type='string')
-                        cmds.connectAttr(new_file_node+'.outColor',convLight+'.'+convAttr)     
+                    if convNumber==2:
+                        if number == 0:
+                            print("Coming in arnold to vray_file_node")
+                            file_path=cmds.listConnections(light + '.'+ attr,type='file')
+                            file_path=''.join(file_path)
+                            print(file_path)
+                            cmds.setAttr(convLight+'.useDomeTex',1)
+                            cmds.connectAttr(file_path+'.outColor',convLight+'.'+convAttr)
+                        else:
+                            print("Coming in renderman to vray_file_node")
+                            cmds.setAttr(convLight+'.useDomeTex',1)
+                            new_file_node=cmds.shadingNode('file',asTexture=True)
+                            cmds.setAttr(new_file_node+'.fileTextureName',value,type='string')
+                            cmds.connectAttr(new_file_node+'.outColor',convLight+'.'+convAttr)     
 
-                if convNumber==0:
-                    print("To arnold")
-                    if number == 2:
-                        print("Coming in vray to arnold")
-                        file_path=cmds.listConnections(light + '.'+ attr,type='file')
-                        file_path=''.join(file_path)
-                        cmds.connectAttr(file_path+'.outColor',convLight+'.'+convAttr)
-                    else:
-                        print("Coming in renderman to arnold")
-                        new_file_node=cmds.shadingNode('file',asTexture=True)
-                        print("created new node")
-                        cmds.setAttr(new_file_node+'.fileTextureName',value,type='string')
-                        cmds.connectAttr(new_file_node+'.outColor',convLight+'.'+convAttr)     
+                    if convNumber==0:
+                        print("To arnold")
+                        if number == 2:
+                            print("Coming in vray to arnold")
+                            file_path=cmds.listConnections(light + '.'+ attr,type='file')
+                            file_path=''.join(file_path)
+                            cmds.connectAttr(file_path+'.outColor',convLight+'.'+convAttr)
+                        else:
+                            print("Coming in renderman to arnold")
+                            new_file_node=cmds.shadingNode('file',asTexture=True)
+                            print("created new node")
+                            cmds.setAttr(new_file_node+'.fileTextureName',value,type='string')
+                            cmds.connectAttr(new_file_node+'.outColor',convLight+'.'+convAttr)     
             
-            except:
-                try:
+                else:
                     try:
-                        cmds.setAttr(convLight+'.'+convAttr,value)
-                    except:
-                        cmds.setAttr(convLight+'.'+convAttr,value[0][0],value[0][1],value[0][2],type='double3')
-                    finally:
-                        pass
-                except:            
-                    if '' in attr.lower():
-                        continue
+                        try:
+                            cmds.setAttr(convLight+'.'+convAttr,value)
+                        except:
+                            cmds.setAttr(convLight+'.'+convAttr,value[0][0],value[0][1],value[0][2],type='double3')
+                        finally:
+                            pass
+                    except:            
+                        if convNumber==2:
+                            if "exposure" in attr.lower():
+                                print("Exposure attribute found. Converting to vray intensity and value = ", value)
+                                intensity_value= cmds.getAttr(light + '.intensity')
+                                if intensity_value !=0:
+                                    print("intensity_value= ",intensity_value)
+                                    new_intensity = intensity_value * (2 ** value)
+                                    print("new_intensity= ",new_intensity)
+                                    cmds.setAttr(convLight+'.intensity',new_intensity)
+                                else:
+                                    continue
+                        
+                        if '' in attr.lower():
+                            continue
         
+            except:
+                if '' in attr.lower():
+                    continue
         except:
-            if '' in attr.lower():
-                continue
-        
+            continue
         
     
     lightTransform=cmds.listRelatives(light,parent=True,shapes=True,fullPath=True)
@@ -364,9 +382,11 @@ def createUI():
             to_index = conversion_map.get(to_renderer)
             
             if from_index is not None and to_index is not None:
+                convertor="Materials"
                 setRenderer(from_index)
                 convertMaterials(from_index, to_index)
                 setRenderer(to_index)
+                conversionComplete(convertor)
                 
     def convert_selected_lights(*args):
         from_renderer = cmds.optionMenu(from_light_menu, query=True, value=True)
@@ -383,9 +403,11 @@ def createUI():
             to_index = conversion_map.get(to_renderer)
             
             if from_index is not None and to_index is not None:
+                convertor="Lights"
                 setRenderer(from_index)
                 convertLights(from_index, to_index)
                 setRenderer(to_index)
+                conversionComplete(convertor)
     
     window_name = "Renderer_Scene_Swapper"
     if cmds.window(window_name, exists=True):
