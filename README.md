@@ -1,6 +1,5 @@
-# Render_Scene_Swapper
+# Renderer_Conversion_Tool
 
-![logo_renderer_scene_swapper](https://github.com/whatshubhamdoes/Render_Scene_Swapper/assets/95402538/341ac8c5-7aa1-4333-b895-cda6d3cac0e2)
 
 
 Setup :
