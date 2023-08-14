@@ -6,11 +6,11 @@ import os
 import sys
 import json
 
-def getCurrentRenderer():
+def getCurrentRenderer(): #Function to get current renderer
     return cmds.getAttr('defaultRenderGlobals.currentRenderer')
 
 
-def getCurrentRenderAttributes():  
+def getCurrentRenderAttributes():  #Function to get current renderer attributes
     render_settings_node = "defaultRenderGlobals" 
     attributes = cmds.listAttr(render_settings_node)
     for attr in attributes:        
@@ -21,19 +21,19 @@ def getCurrentRenderAttributes():
         value = cmds.getAttr(render_settings_node + '.' + attr)
         print("Attribute Value:", value)
 
-def setRenderer(from_index):
+def setRenderer(from_index): #Function to set current renderer
     renderers = ["arnold", "renderman", "vray"]
     if 0 <= from_index < len(renderers):
         cmds.setAttr("defaultRenderGlobals.currentRenderer", renderers[from_index], type="string")
     else:
         print("Not able to change renderer")
 
-def conversionComplete(convertor):
+def conversionComplete(convertor): #Function to make a prompt of conversion complete
     cmds.confirmDialog(title='Conversion Complete', message='Conversion Complete of all the selected ' f"{convertor}", button=['OK'], defaultButton='OK')
     cmds.warning("Conversion Complete of all the selected ",convertor)
     return
 
-def checkCurrentRenderer(currentRenderer,anyDictionaryAddress):
+def checkCurrentRenderer(currentRenderer,anyDictionaryAddress): #Function to check currender renderer from list of supported renderers
     with open(anyDictionaryAddress,'r') as file :
         data=json.load(file)
         try:
@@ -45,19 +45,19 @@ def checkCurrentRenderer(currentRenderer,anyDictionaryAddress):
                 if currentRenderer in rendererInfo:
                     return ("Renderer Supported")
 
-def assignNumber(currentRenderer):
+def assignNumber(currentRenderer): #Function to assign an index according to current renderer
     renderer_map = {"arnold": 0, "renderman": 1, "vray": 2}
     return renderer_map.get(currentRenderer, False)
 
 
-def createLightComponentMap(components_light_map,lightsData,light_type,number):
+def createLightComponentMap(components_light_map,lightsData,light_type,number): #Function to create a light component map using json dictionary and user inputs
     for light in lightsData["Lights"]:
         if light != "renderer":
             for key,value in lightsData["Lights"][light_type].items():
                 if key in ["attribute_intensity","attribute_color","attribute_exposure"]:
                     components_light_map[key]=value[number]
 
-def createMaterialComponentMap(components_material_map,materialsData,material_type,number):
+def createMaterialComponentMap(components_material_map,materialsData,material_type,number): #Function to create a material component map using json dictionary and user inputs
     for material in materialsData["Materials"]:
         if material != "renderer":
             for key,value in materialsData["Materials"][material_type].items():
@@ -65,56 +65,56 @@ def createMaterialComponentMap(components_material_map,materialsData,material_ty
                     components_material_map[key]= value[number]
 
 
-def copyLightAttributes(light,lightsData,light_type,number,convNumber):
+def copyLightAttributes(light,lightsData,light_type,number,convNumber): #Function to copy light attributes across different renderers
     convLight=lightsData["Lights"][light_type]["name"][convNumber]
-    print(convLight)
+    print("Converting to : ", convLight)
     conv=lightsData["Lights"][light_type]["renderer"][convNumber]
     convLight=cmds.shadingNode(f"{convLight}",asLight=True,name=f"{light}_{conv}")
     
     components_light_map={}
     createLightComponentMap(components_light_map,lightsData,light_type,number)
-    print(components_light_map)
+    #print(components_light_map)
 
     components_convLight_map={}
     createLightComponentMap(components_convLight_map,lightsData,light_type,convNumber)
-    print(components_convLight_map)
+    #print(components_convLight_map)
 
     for attr,convAttr in zip(components_light_map.values(),components_convLight_map.values()):
         try:
             value=cmds.getAttr(light+'.'+attr)
-            print(value)
+            #print(value)
             file_node=cmds.connectionInfo(light + '.'+ attr, sourceFromDestination=True)
-            print(file_node)
+            #print(file_node)
             file_node=''.join(file_node)
             try:
                 if file_node != "":
-                    print("inside file node")
+                    #print("inside file node")
                     if convNumber==1:
                         if number==0:
-                            print("Coming in arnold to renderman_file_node")
+                            #print("Coming in arnold to renderman_file_node")
                             file_path=cmds.listConnections(light + '.'+ attr,type='file')
                             file_path=''.join(file_path)
                             file_path=cmds.getAttr("%s.fileTextureName" % file_path)
-                            print(file_path)
+                            #print(file_path)
                             cmds.setAttr(convLight+'.'+convAttr,file_path,type='string')
                         else:
-                            print("Coming in vray to renderman_file_node")
+                            #print("Coming in vray to renderman_file_node")
                             file_path=cmds.listConnections(light + '.'+ attr,type='file')
                             file_path=''.join(file_path)
                             file_path=cmds.getAttr("%s.fileTextureName" % file_path)
-                            print(file_path)
+                            #print(file_path)
                             cmds.setAttr(convLight+'.'+convAttr,file_path,type='string')
 
                     if convNumber==2:
                         if number == 0:
-                            print("Coming in arnold to vray_file_node")
+                            #print("Coming in arnold to vray_file_node")
                             file_path=cmds.listConnections(light + '.'+ attr,type='file')
                             file_path=''.join(file_path)
-                            print(file_path)
+                            #print(file_path)
                             cmds.setAttr(convLight+'.useDomeTex',1)
                             cmds.connectAttr(file_path+'.outColor',convLight+'.'+convAttr)
                         else:
-                            print("Coming in renderman to vray_file_node")
+                            #print("Coming in renderman to vray_file_node")
                             cmds.setAttr(convLight+'.useDomeTex',1)
                             new_file_node=cmds.shadingNode('file',asTexture=True)
                             cmds.setAttr(new_file_node+'.fileTextureName',value,type='string')
@@ -123,14 +123,14 @@ def copyLightAttributes(light,lightsData,light_type,number,convNumber):
                     if convNumber==0:
                         print("To arnold")
                         if number == 2:
-                            print("Coming in vray to arnold")
+                            #print("Coming in vray to arnold")
                             file_path=cmds.listConnections(light + '.'+ attr,type='file')
                             file_path=''.join(file_path)
                             cmds.connectAttr(file_path+'.outColor',convLight+'.'+convAttr)
                         else:
-                            print("Coming in renderman to arnold")
+                            #print("Coming in renderman to arnold")
                             new_file_node=cmds.shadingNode('file',asTexture=True)
-                            print("created new node")
+                            #print("created new node")
                             cmds.setAttr(new_file_node+'.fileTextureName',value,type='string')
                             cmds.connectAttr(new_file_node+'.outColor',convLight+'.'+convAttr)     
             
@@ -145,12 +145,12 @@ def copyLightAttributes(light,lightsData,light_type,number,convNumber):
                     except:            
                         if convNumber==2:
                             if "exposure" in attr.lower():
-                                print("Exposure attribute found. Converting to vray intensity and value = ", value)
+                                #print("Exposure attribute found. Converting to vray intensity and value = ", value)
                                 intensity_value= cmds.getAttr(light + '.intensity')
                                 if intensity_value !=0:
-                                    print("intensity_value= ",intensity_value)
+                                    #print("intensity_value= ",intensity_value)
                                     new_intensity = intensity_value * (2 ** value)
-                                    print("new_intensity= ",new_intensity)
+                                    #print("new_intensity= ",new_intensity)
                                     cmds.setAttr(convLight+'.intensity',new_intensity)
                                 else:
                                     continue
@@ -164,37 +164,36 @@ def copyLightAttributes(light,lightsData,light_type,number,convNumber):
         except:
             continue
         
-    
     lightTransform=cmds.listRelatives(light,parent=True,shapes=True,fullPath=True)
     cmds.matchTransform(f"{convLight}", lightTransform)
     lightSet=cmds.listRelatives(lightTransform,parent=True,fullPath=True)
     if lightSet:
         cmds.parent(f"{convLight}", lightSet)    
 
-def copyMaterialAttributes(mat, materialsData, material_type, number, convNumber):
+def copyMaterialAttributes(mat, materialsData, material_type, number, convNumber): #Function to copy material attributes across different renderers
     convMaterial = materialsData["Materials"][material_type]["name"][convNumber]
-    print("First Conv Material")
-    print(convMaterial)
+    #print("First Conv Material")
+    print("Converting to : ",convMaterial)
     conv= materialsData["Materials"][material_type]["renderer"][convNumber]
     convMaterial = cmds.shadingNode(f"{convMaterial}", asShader=True, name=f"{mat}_{conv}")
-    print("Second Conv Material")
-    print(convMaterial) 
+    #print("Second Conv Material")
+    #print(convMaterial) 
     # Naming wrong of shading group
     convMaterialShadingGroup = cmds.sets(convMaterial, renderable=True, noSurfaceShader=True, empty=True, name=convMaterial + 'SG')
-    print("Conv material shading group")
-    print(convMaterialShadingGroup)
+    #print("Conv material shading group")
+    #print(convMaterialShadingGroup)
     cmds.connectAttr(convMaterial + '.outColor', convMaterialShadingGroup + '.surfaceShader', force=True)
     
     components_material_map = {}
     createMaterialComponentMap(components_material_map, materialsData, material_type, number)
-    print(components_material_map)
+    #print(components_material_map)
     
     components_convMaterial_map = {}
     createMaterialComponentMap(components_convMaterial_map, materialsData, material_type, convNumber)
-    print(components_convMaterial_map)
+    #print(components_convMaterial_map)
     
     for attr, convAttr in zip(components_material_map.values(), components_convMaterial_map.values()):
-        print("entered for loop")
+        #print("entered for loop")
         try:
             print("attr = " , attr)
             print("convAttr = ", convAttr)
@@ -202,27 +201,28 @@ def copyMaterialAttributes(mat, materialsData, material_type, number, convNumber
             print("value = ",value)
             file_node=cmds.connectionInfo(mat+'.'+attr,sourceFromDestination=True)
             file_node=''.join(file_node)
-            print("file_node = ",file_node)
+            #print("file_node = ",file_node)
             if "emissionColor" in attr:
                 emissiongain=cmds.getAttr(mat+'.emission')
                 if emissiongain != 0.0 :
-                    print(emissiongain)
-                    print("entered emission")
+                    # print(emissiongain)
+                    # print("entered emission")
                     if file_node != "":
-                        print("entered emission file node")
+                        #print("entered emission file node")
                         convMaterial=''.join(convMaterial)
-                        print("if file_node is true: convMaterial = ", convMaterial)
+                        #print("if file_node is true: convMaterial = ", convMaterial)
                         cmds.connectAttr(file_node,convMaterial+'.'+convAttr)
+                        print("Value set")
             
                     else:
-                        print("entering emission value set")
+                        #print("entering emission value set")
                         try:
                             try:
                                 cmds.setAttr(convMaterial+'.'+convAttr,value)
-                                print("Value set 1st try")
+                                print("Value set on 1st try")
                             except:
                                 cmds.setAttr(convMaterial+'.'+convAttr,value[0][0],value[0][1],value[0][2],type='double3')
-                                print("Value set 2nd try")
+                                print("Value set on 2nd try")
                             finally:
                                 print("Not Set = ", attr)
                         except:            
@@ -233,30 +233,30 @@ def copyMaterialAttributes(mat, materialsData, material_type, number, convNumber
             else:
                 if file_node != "":
                     convMaterial=''.join(convMaterial)
-                    print("if file_node is true: convMaterial = ", convMaterial)
+                    #print("if file_node is true: convMaterial = ", convMaterial)
                     cmds.connectAttr(file_node,convMaterial+'.'+convAttr)
         
                 else:
                     try:
                         try:
                             cmds.setAttr(convMaterial+'.'+convAttr,value)
-                            print("Value set 1st try")
+                            print("Value set on 1st try")
                         except:
                             cmds.setAttr(convMaterial+'.'+convAttr,value[0][0],value[0][1],value[0][2],type='double3')
-                            print("Value set 2nd try")
+                            print("Value set on 2nd try")
                         finally:
-                            print("Done  = ", attr)
+                            print("Not Set  = ", attr)
                     except:            
                         if '' in convAttr.lower():
                             continue
         except:
             pass
     
-    print("before returning conv material shading group = ")
-    print(convMaterialShadingGroup)
+    #print("before returning conv material shading group = ")
+    #print(convMaterialShadingGroup)
     return convMaterialShadingGroup
 
-def lightsConversion(convNumber,light_conversion_map,lightDictionaryAddress):
+def lightsConversion(convNumber,light_conversion_map,lightDictionaryAddress): # Function to convert light to its equivalent in the other renderer
     with open(lightDictionaryAddress,'r') as file :
         lightsData=json.load(file)
     currentRenderer=getCurrentRenderer()    
@@ -269,19 +269,19 @@ def lightsConversion(convNumber,light_conversion_map,lightDictionaryAddress):
 
     for obj in sel:
         lights = cmds.ls(sl=True, dag=True, s=True)
-        print(lights)
+        print("Lights : ",lights)
         for light in lights:
-            print(light)
+            print("Converting Light : ", light)
             light_type = cmds.nodeType(light)
-            print(light_type)
+            #print(light_type)
             if light_type in light_conversion_map:
                 light_type = light_conversion_map[light_type]
-                print(light_type)
+                #print(light_type)
                 copyLightAttributes(light, lightsData, light_type, number, convNumber)
             else:
                 continue
 
-def materialsConversion(convNumber,material_conversion_map,materialDictionaryAddress):
+def materialsConversion(convNumber,material_conversion_map,materialDictionaryAddress): # Function to convert material to its equivalent in the other renderer
     with open(materialDictionaryAddress,'r') as file :
         materialsData=json.load(file)
     currentRenderer=getCurrentRenderer()    
@@ -294,25 +294,25 @@ def materialsConversion(convNumber,material_conversion_map,materialDictionaryAdd
 
     for obj in sel:
         objects=cmds.ls(sl=True,dag=True,s=True)
-        print (objects)
+        print ("Selected Objects: ", objects)
         for object in objects:
-            print (object)
+            print ("Selected Object: ",object)
             shadeEng=cmds.listConnections(object,type='shadingEngine')
-            print(shadeEng)
+            #print(shadeEng)
             if shadeEng :
                 for sg in shadeEng :
-                    print (sg)
+                    #print (sg)
                     material=cmds.ls(cmds.listConnections(sg),materials = True)
-                    print(material)
+                    print("Material : ", material)
                     for mat in material:
                         material_type=cmds.nodeType(mat)
-                        print(material_type)
-                        print("check")
+                        #print(material_type)
+                        #print("check")
                         if material_type in material_conversion_map :
-                            print("check2")
+                            #print("check2")
                             material_type=material_conversion_map[material_type]
-                            print(material_type)
-                            print("check3")
+                            #print(material_type)
+                            #print("check3")
                             shading_group= copyMaterialAttributes(mat, materialsData, material_type, number, convNumber)
                             cmds.sets(object,edit=True,forceElement=shading_group)
                         else :
@@ -328,12 +328,12 @@ def materialsConversion(convNumber,material_conversion_map,materialDictionaryAdd
                                 continue
                                 
 
-def convertLights(fromNumber,convNumber):
+def convertLights(fromNumber,convNumber): #Function to convert lights
     lightDictionaryAddress="/transfer/s5512613_SP/Masters_Project/Render_Scene_Swapper/Dictionary/lights.json"
     with open(lightDictionaryAddress,'r') as file :
         lightsData=json.load(file)
     currentRenderer=getCurrentRenderer()
-    print(currentRenderer)
+    #print(currentRenderer)
     check1=checkCurrentRenderer(currentRenderer,lightDictionaryAddress)
     light_conversion_map = {
         lightsData["Lights"]["area_light"]["name"][fromNumber]: "area_light",
@@ -348,12 +348,12 @@ def convertLights(fromNumber,convNumber):
     else:
         print("Renderer not supported for conversion")
 
-def convertMaterials(fromNumber,convNumber):
+def convertMaterials(fromNumber,convNumber): #Function to convert materials
     materialDictionaryAddress="/transfer/s5512613_SP/Masters_Project/Render_Scene_Swapper/Dictionary/materials.json"
     with open(materialDictionaryAddress,'r') as file :
         materialsData=json.load(file)
     currentRenderer=getCurrentRenderer()
-    print(currentRenderer)
+    #print(currentRenderer)
     check1=checkCurrentRenderer(currentRenderer,materialDictionaryAddress)
     material_conversion_map = {
         materialsData["Materials"]["standard_material"]["name"][fromNumber] : "standard_material",
@@ -364,10 +364,9 @@ def convertMaterials(fromNumber,convNumber):
     else:
         print("Renderer not supported for conversion")
 
-def createUI():
+def createUI(): #Function to create UI and run the code
     
-    # Function to call the selected conversion function
-    def convert_selected_materials(*args):
+    def convert_selected_materials(*args): # Function to call the convert material function
         from_renderer = cmds.optionMenu(from_material_menu, query=True, value=True)
         to_renderer = cmds.optionMenu(to_material_menu, query=True, value=True)
         
@@ -388,7 +387,7 @@ def createUI():
                 setRenderer(to_index)
                 conversionComplete(convertor)
                 
-    def convert_selected_lights(*args):
+    def convert_selected_lights(*args): # Function to call the convert material function
         from_renderer = cmds.optionMenu(from_light_menu, query=True, value=True)
         to_renderer = cmds.optionMenu(to_light_menu, query=True, value=True)
         
