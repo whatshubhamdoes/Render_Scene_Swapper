@@ -41,13 +41,13 @@ Currently, the supported renderers are :
 
 
 # Scene rendered using Arnold
-![Image!](images/Test_Renders/Scene_1/arnold_render.jpg)
+![Image!](Images/Test_Renders/Scene_1/arnold_render.jpg)
 
 # Scene converted from Arnold to V-Ray and rendered
-![Image!](images/Test_Renders/Scene_1/vray_render.jpg)
+![Image!](Images/Test_Renders/Scene_1/vray_render.jpg)
 
 # Same scene converted from V-Ray to Renderman
-![Image!](images/Test_Renders/Scene_1/renderman_render.jpg)
+![Image!](Images/Test_Renders/Scene_1/renderman_render.jpg)
 
 
 ## Video Demonstrating the tool
@@ -55,29 +55,29 @@ Currently, the supported renderers are :
 
 ## Test renders of different scenes (Always in this order : Arnold, Renderman, VRay)
 *   Scene 2
-![Image!](images/Test_Renders/Scene_2/arnold_render.jpg)
-![Image!](images/Test_Renders/Scene_2/renderman_render.jpg)
-![Image!](images/Test_Renders/Scene_2/vray_render.jpg)
+![Image!](Images/Test_Renders/Scene_2/arnold_render.jpg)
+![Image!](Images/Test_Renders/Scene_2/renderman_render.jpg)
+![Image!](Images/Test_Renders/Scene_2/vray_render.jpg)
 
 *   Scene 3
-![Image!](images/Test_Renders/Scene_3/arnold_render.jpg)
-![Image!](images/Test_Renders/Scene_3/renderman_render.jpg)
-![Image!](images/Test_Renders/Scene_3/vray_render.jpg)
+![Image!](Images/Test_Renders/Scene_3/arnold_render.jpg)
+![Image!](Images/Test_Renders/Scene_3/renderman_render.jpg)
+![Image!](Images/Test_Renders/Scene_3/vray_render.jpg)
 
 *   Scene 4
-![Image!](images/Test_Renders/Scene_4/arnold_render.jpg)
-![Image!](images/Test_Renders/Scene_4/renderman_render.jpg)
-![Image!](images/Test_Renders/Scene_4/vray_render.jpg)
+![Image!](Images/Test_Renders/Scene_4/arnold_render.jpg)
+![Image!](Images/Test_Renders/Scene_4/renderman_render.jpg)
+![Image!](Images/Test_Renders/Scene_4/vray_render.jpg)
 
 *   Scene 5
-![Image!](images/Test_Renders/Scene_5/arnold_render.jpg)
-![Image!](images/Test_Renders/Scene_5/renderman_render.jpg)
-![Image!](images/Test_Renders/Scene_5/vray_render.jpg)
+![Image!](Images/Test_Renders/Scene_5/arnold_render.jpg)
+![Image!](Images/Test_Renders/Scene_5/renderman_render.jpg)
+![Image!](Images/Test_Renders/Scene_5/vray_render.jpg)
 
 *   Scene 6
-![Image!](images/Test_Renders/Scene_6/arnold_render.jpg)
-![Image!](images/Test_Renders/Scene_6/renderman_render.jpg)
-![Image!](images/Test_Renders/Scene_6/vray_render.jpg)
+![Image!](Images/Test_Renders/Scene_6/arnold_render.jpg)
+![Image!](Images/Test_Renders/Scene_6/renderman_render.jpg)
+![Image!](Images/Test_Renders/Scene_6/vray_render.jpg)
 
 ## Required Packages/Modules
 * If the user has Python, Autodesk Maya and all the supported renderers installed on their devices then the tool doesn't require any other package/module.
