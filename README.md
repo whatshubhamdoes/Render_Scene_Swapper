@@ -70,9 +70,9 @@ Currently, the supported renderers are :
 ![Image!](Images/Test_Renders/Scene_4/vray_render.jpg)
 
 *   Scene 5
-![Image!](Images/Test_Renders/Scene_5/arnold_render.jpg)
-![Image!](Images/Test_Renders/Scene_5/renderman_render.jpg)
-![Image!](Images/Test_Renders/Scene_5/vray_render.jpg)
+![Image!](Images/Test_Renders/Scene_5/car/arnold_render.jpg)
+![Image!](Images/Test_Renders/Scene_5/car/renderman_render.jpg)
+![Image!](Images/Test_Renders/Scene_5/car/vray_render.jpg)
 
 *   Scene 6
 ![Image!](Images/Test_Renders/Scene_6/arnold_render.jpg)
