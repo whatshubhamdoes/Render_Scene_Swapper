@@ -51,11 +51,7 @@ Currently, the supported renderers are :
 
 
 ## Video Demonstrating the tool
-
-
-Uploading demo.mp4…
-
-
+![Video!](Video/demo.mp4)
 
 ## Test renders of different scenes (Always in this order : Arnold, Renderman, VRay)
 *   Scene 2
