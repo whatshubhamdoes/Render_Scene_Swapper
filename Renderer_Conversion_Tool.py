@@ -364,7 +364,38 @@ def convertMaterials(fromNumber,convNumber): #Function to convert materials
     else:
         print("Renderer not supported for conversion")
 
-def createUI(): #Function to create UI and run the code
+def convertLightsAndMaterials(fromNumber,convNumber,conversion_type):
+    lightDictionaryAddress="/transfer/s5512613_SP/Masters_Project/Render_Scene_Swapper/Dictionary/lights.json"
+    materialDictionaryAddress="/transfer/s5512613_SP/Masters_Project/Render_Scene_Swapper/Dictionary/materials.json"
+    with open(lightDictionaryAddress, 'r') as light_file, open(materialDictionaryAddress, 'r') as material_file:
+        lightsData = json.load(light_file)
+        materialsData = json.load(material_file)
+    currentRenderer = getCurrentRenderer()
+    check1 = checkCurrentRenderer(currentRenderer, lightDictionaryAddress)
+    
+    light_conversion_map = {
+        lightsData["Lights"]["area_light"]["name"][fromNumber]: "area_light",
+        lightsData["Lights"]["point_light"]["name"][fromNumber]: "point_light",
+        lightsData["Lights"]["directional_light"]["name"][fromNumber]: "directional_light",
+        lightsData["Lights"]["spot_light"]["name"][fromNumber]: "spot_light",
+        lightsData["Lights"]["skyDome_light"]["name"][fromNumber]: "skyDome_light",
+        lightsData["Lights"]["mesh_light"]["name"][fromNumber]: "mesh_light"
+    }
+
+    material_conversion_map = {
+        materialsData["Materials"]["standard_material"]["name"][fromNumber] : "standard_material",
+        materialsData["Materials"]["hair_material"]["name"][fromNumber] : "hair_material"
+    }
+    
+    if check1== "Renderer Supported":
+        if "lights" in conversion_type or "both" in conversion_type:
+            lightsConversion(convNumber,light_conversion_map,lightDictionaryAddress)
+        if "materials" in conversion_type or "both" in conversion_type:
+            materialsConversion(convNumber,material_conversion_map,materialDictionaryAddress)
+    else:
+        print("Renderer not supported for conversion")
+
+def createUI_new(): #Function to create UI and run the code
     
     def convert_selected_materials(*args): # Function to call the convert material function
         from_renderer = cmds.optionMenu(from_material_menu, query=True, value=True)
@@ -470,5 +501,111 @@ def createUI(): #Function to create UI and run the code
     
     cmds.showWindow(window_name)
 
+""" def createUI(): #Function to create UI and run the code
+    
+    def convert_selected_materials(*args): # Function to call the convert material function
+        from_renderer = cmds.optionMenu(from_material_menu, query=True, value=True)
+        to_renderer = cmds.optionMenu(to_material_menu, query=True, value=True)
+        
+        conversion_map = {
+            "Arnold": 0,
+            "Renderman": 1,
+            "VRay": 2
+        }
+        
+        if from_renderer and to_renderer:
+            from_index = conversion_map.get(from_renderer)
+            to_index = conversion_map.get(to_renderer)
+            
+            if from_index is not None and to_index is not None:
+                convertor="Materials"
+                setRenderer(from_index)
+                convertMaterials(from_index, to_index)
+                setRenderer(to_index)
+                conversionComplete(convertor)
+                
+    def convert_selected_lights(*args): # Function to call the convert material function
+        from_renderer = cmds.optionMenu(from_light_menu, query=True, value=True)
+        to_renderer = cmds.optionMenu(to_light_menu, query=True, value=True)
+        
+        conversion_map = {
+            "Arnold": 0,
+            "Renderman": 1,
+            "VRay": 2
+        }
+        
+        if from_renderer and to_renderer:
+            from_index = conversion_map.get(from_renderer)
+            to_index = conversion_map.get(to_renderer)
+            
+            if from_index is not None and to_index is not None:
+                convertor="Lights"
+                setRenderer(from_index)
+                convertLights(from_index, to_index)
+                setRenderer(to_index)
+                conversionComplete(convertor)
+    
+    window_name = "Renderer_Scene_Swapper"
+    if cmds.window(window_name, exists=True):
+        cmds.deleteUI(window_name)
+        
+    cmds.window(window_name, title="Renderer Conversion Tool : Maya", iconName="RCT",widthHeight=(500, 300))
+
+    #cmds.columnLayout(adjustableColumn=True,width=500, height=265)
+    #cmds.image( image='/transfer/s5512613_SP/Masters_Project/Render_Scene_Swapper/Images/logo_renderer_scene_swapper')
+    #cmds.separator(height=100, style='shelf')
+
+
+    # Creating two optionMenus to choose the conversion from and to renderers for materials
+    cmds.columnLayout(adjustableColumn=True, width=505, height=265,columnAlign="center")  # Set width and alignment
+    
+    cmds.text(label=" Renderer Conversion Tool : Maya ", height=20,font="boldLabelFont",align="center", backgroundColor=[0.8, 0.8, 0.8])  # Center align with background color
+    cmds.text(label=" Note : Please make sure all the objects and lights are in separate groups. ", height=13,font="smallPlainLabelFont",align="center", backgroundColor=[0.8, 0.8, 0.8])  # Center align with background color
+    #cmds.image( image='/transfer/s5512613_SP/Masters_Project/Render_Scene_Swapper/Images/logo_renderer_scene_swapper' )
+    cmds.separator(height=10, style='single')
+
+    cmds.columnLayout(adjustableColumn=True, width=500, columnAlign="center",bgc=[0.8,0.8,0.8])
+    # Materials Conversion Section
+    cmds.text(label=" Materials Conversion ", height = 25,font="smallBoldLabelFont",align="center", backgroundColor=[0.0, 0.0, 0.3])  # Center align with background color
+    cmds.text(label="Please select the object group/groups or all the objects and then press the CONVERT button:", align="center", backgroundColor=[0.0, 0.0, 0.2])  # Center align
+    
+    from_material_menu = cmds.optionMenu(label="From :", backgroundColor=[0.2, 0.2, 0.2])
+    cmds.menuItem(label="Arnold")
+    cmds.menuItem(label="Renderman")
+    cmds.menuItem(label="VRay")
+    
+    to_material_menu = cmds.optionMenu(label="To   :", backgroundColor=[0.2, 0.2, 0.2])
+    cmds.menuItem(label="Arnold")
+    cmds.menuItem(label="Renderman")
+    cmds.menuItem(label="VRay")
+    
+    # Convert Button for Materials
+    cmds.button(label="Convert", command=convert_selected_materials)
+    
+    cmds.columnLayout(adjustableColumn=True, width=500, columnAlign="center",bgc=[0.8,0.8,0.8])
+    # Create a separator
+    cmds.separator(height=5, style='shelf')
+
+    cmds.columnLayout(adjustableColumn=True, width=500, columnAlign="center",bgc=[0.2,0.2,0.5])
+    # Lights Conversion Section
+    cmds.text(label=" Lights Conversion ", height = 25,font="smallBoldLabelFont",align="center", backgroundColor=[0.3, 0.3, 0.0])  # Center align with background color
+    cmds.text(label="Please select the light group/groups or all the lights and then press the CONVERT button:", align="center", backgroundColor=[0.2, 0.2, 0.0])  # Center align
+    
+    from_light_menu = cmds.optionMenu(label="From :", backgroundColor=[0.2, 0.2, 0.2])
+    cmds.menuItem(label="Arnold")
+    cmds.menuItem(label="Renderman")
+    cmds.menuItem(label="VRay")
+    
+    to_light_menu = cmds.optionMenu(label="To   :", backgroundColor=[0.2, 0.2, 0.2])
+    cmds.menuItem(label="Arnold")
+    cmds.menuItem(label="Renderman")
+    cmds.menuItem(label="VRay")
+    
+    cmds.columnLayout(adjustableColumn=True, width=500, columnAlign="center",bgc=[0.8,0.8,0.8])
+    # Convert Button for Lights
+    cmds.button(label="Convert", command=convert_selected_lights)
+    
+    cmds.showWindow(window_name) """
+
 # Calling the createUI function
-createUI()
+createUI_new()
